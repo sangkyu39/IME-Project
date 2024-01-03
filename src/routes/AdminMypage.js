@@ -23,7 +23,7 @@ function AdminMypage() {
 			<ContentContainer id="adminMypage">
 				<div
 					style={{
-						margin: "auto",
+						marginLeft: "2.5rem",
 					}}>
 					<p className="title">마이페이지</p>
 					<div className="infoDiv">
@@ -107,13 +107,13 @@ export default AdminMypage;
 
 const MyPageStyled = styled.div`
 	background: var(--background, #f4f7fe);
-	height: 100vh;
-	width: 100vw;
 	display: flex;
+	width: 100%;
 `;
 
 const ContentContainer = styled.div`
-	width: 100%;
+	padding-right: 2.5rem;
 	display: flex;
 	flex-direction: column;
+	background: var(--background, #f4f7fe);
 `;
