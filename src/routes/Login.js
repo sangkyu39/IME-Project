@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import "./Login.css";
 import logoTitle from "../assets/LogoTitle.svg";
 import axios from "axios";
-import { AlternateEmail } from "@mui/icons-material";
+import { Routes, Route, Link, useNavigate, Outlet } from "react-router-dom";
 
 function Login() {
+	let navigate = useNavigate();
 	const [studentId, setStudentId] = useState("");
 	const [password, setPassword] = useState("");
 	const [isCorrect, setIsCorrect] = useState(true);
-	const loginURL = "http://54.180.70.111:8081/api/v2/auth/login";
+	const loginURL = "";
 	const onChange = (e) => {
 		const {
 			target: { name, value },
@@ -27,20 +28,15 @@ function Login() {
 			setIsCorrect(false);
 			return;
 		} else {
-			let body = {
+			const formData = {
 				id: studentId,
 				pw: password,
 			};
-			console.log(body);
-			fetch(loginURL, {
-				method: "POST",
-				body: body,
-			}).then((res) => {
-				console.log(res);
-			});
-			axios.post(loginURL, body).then((res) => {
-				console.log(res.status);
-			});
+
+			// axios.post(loginURL, formData).then((res) => {
+			// 	console.log(res.status);
+			// });
+			navigate("/mypage");
 		}
 	};
 	return (

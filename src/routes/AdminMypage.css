@@ -1,0 +1,155 @@
+#adminMypage .title {
+	color: var(--grayscale-600, #2b3674);
+	text-align: left;
+	/* title1 */
+	font-family: DM Sans;
+	font-size: 2.125rem;
+	font-style: normal;
+	font-weight: 700;
+	line-height: 2.625rem; /* 123.529% */
+	letter-spacing: -0.0425rem;
+	margin: 1rem 0 4rem 0;
+}
+
+#adminMypage .infoDiv {
+	width: 66.25rem;
+	height: 51.875rem;
+	flex-shrink: 0;
+	border-radius: 1.25rem;
+	background: var(--white, #fff);
+	padding: 3rem 48px 40px 48px;
+}
+
+#adminMypage .saveBTN {
+	border: none;
+	display: inline-flex;
+	float: right;
+	height: 3.75rem;
+	padding: 0.625rem 2.5rem;
+	justify-content: center;
+	align-items: center;
+	gap: 0.625rem;
+	flex-shrink: 0;
+	border-radius: 1.25rem;
+	background: var(--primary-50, #fde6eb);
+
+	color: var(--primary-500, #e80035);
+	text-align: center;
+
+	/* body1 */
+	font-family: Pretendard;
+	font-size: 1rem;
+	font-style: normal;
+	font-weight: 700;
+	line-height: normal;
+	letter-spacing: -0.02rem;
+}
+
+#adminMypage .search-input {
+	position: relative;
+	display: inline-block;
+}
+
+#adminMypage .search-input input[type="text"] {
+	display: flex;
+	width: 12.5rem;
+	padding: 0.75rem 1rem;
+	padding-left: 2.5rem; /* 돋보기 이미지를 고려한 왼쪽 패딩 설정 */
+	align-items: center;
+	gap: 0.25rem;
+	border-radius: 0.5rem;
+	border: 1px solid var(--grayscale-50, #e0e5f2);
+}
+
+#adminMypage .search-input input[type="text"]::placeholder {
+	color: var(--grayscale-300, #a3aed0);
+	font-family: Pretendard;
+	font-size: 1rem;
+	font-style: normal;
+	font-weight: 400;
+	line-height: normal;
+	letter-spacing: -0.02rem;
+}
+
+#adminMypage .search-input .search-icon {
+	position: absolute;
+	top: 50%;
+	left: 10px;
+	transform: translateY(-50%);
+	pointer-events: none; /* 돋보기 이미지에 마우스 이벤트를 적용하지 않음 */
+}
+
+#adminMypage .search-input input[type="text"]:focus::placeholder {
+	color: transparent; /* 타이핑을 시작하면 플레이스홀더 텍스트를 투명하게 설정하여 사라지도록 함 */
+}
+
+#adminMypage .dataload {
+	display: inline-block;
+	margin-left: 2.5rem;
+	float: right;
+}
+
+#adminMypage .dataload span {
+	margin-left: 1rem;
+	color: var(--grayscale-600, #2b3674);
+
+	/* body1 */
+	font-family: Pretendard;
+	font-size: 1rem;
+	font-style: normal;
+	font-weight: 700;
+	line-height: normal;
+	letter-spacing: -0.02rem;
+}
+
+#adminMypage .infoTable th {
+	width: 10rem;
+	padding: 1rem;
+	align-items: center;
+	gap: 0.5rem;
+	background: var(--background, #f4f7fe);
+	color: var(--grayscale-600, #2b3674);
+
+	font-family: Pretendard;
+	font-size: 0.875rem;
+	font-style: normal;
+	font-weight: 700;
+	line-height: normal;
+	letter-spacing: -0.0175rem;
+}
+
+#adminMypage .infoTable td {
+	width: 10rem;
+	padding: 1rem;
+	align-items: center;
+	gap: 0.5rem;
+	color: var(--grayscale-600, #2b3674);
+
+	/* body2 */
+	font-family: Pretendard;
+	font-size: 0.875rem;
+	font-style: normal;
+	font-weight: 500;
+	line-height: normal;
+	letter-spacing: -0.0175rem;
+}
+
+#adminMypage .noneInfo {
+	display: flex;
+	text-align: center;
+	align-items: center;
+	height: 35rem;
+	justify-content: center;
+}
+
+#adminMypage .noneInfo p {
+	color: var(--grayscale-600, #2b3674);
+	text-align: center;
+
+	/* title4 */
+	font-family: Pretendard;
+	font-size: 1.125rem;
+	font-style: normal;
+	font-weight: 700;
+	line-height: normal;
+}
