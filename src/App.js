@@ -6,17 +6,17 @@ import MyPage from "./routes/MyPage";
 import AdminMypage from "./routes/AdminMypage";
 
 function App() {
-	return (
-		<div className="App">
-			<Router>
-				<Routes>
-					<Route path="/" element={<Login />} />
-					<Route path="/mypage" element={<MyPage />} />
-					<Route path="/admin" element={<AdminMypage />} />
-				</Routes>
-			</Router>
-		</div>
-	);
+  return (
+    <div className="App">
+      <Router>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/mypage" element={<MyPage />} />
+          <Route path="/admin" element={<AdminMypage />} />
+        </Routes>
+      </Router>
+    </div>
+  );
 }
 
 export default App;

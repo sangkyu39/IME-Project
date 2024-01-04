@@ -111,10 +111,7 @@ const SiderBar = () => {
 
 const SiderBarStyled = styled.div`
   width: 300px;
-  height: 100vh;
   min-width: 300px;
-  min-height: 100vh
-  padding-top: 30px;
   background: var(--white, #fff);
 `;
 
