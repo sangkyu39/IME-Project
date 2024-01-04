@@ -89,7 +89,7 @@
 	float: right;
 }
 
-#adminMypage .dataload span {
+#adminMypage .dataload a {
 	margin-left: 1rem;
 	color: var(--grayscale-600, #2b3674);
 
@@ -109,7 +109,7 @@
 	gap: 0.5rem;
 	background: var(--background, #f4f7fe);
 	color: var(--grayscale-600, #2b3674);
-
+	user-select: none;
 	font-family: Pretendard;
 	font-size: 0.875rem;
 	font-style: normal;
@@ -152,4 +152,22 @@
 	font-style: normal;
 	font-weight: 700;
 	line-height: normal;
+}
+
+#adminMypage input[type="checkbox"] {
+	display: none;
+}
+
+#adminMypage input[type="checkbox"] + label {
+	border: 1.5px solid #e0e5f2;
+	display: inline-block;
+	width: 1.5rem;
+	height: 1.5rem;
+	cursor: pointer;
+	border-radius: 0.375rem;
+}
+
+#adminMypage input[type="checkbox"]:checked + label {
+	background: url(../assets/check.svg) #ed3335 no-repeat center/10px 10px;
+	border: none;
 }
