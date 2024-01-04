@@ -89,7 +89,7 @@
 	float: right;
 }
 
-#adminMypage .dataload a {
+#adminMypage .dataload span {
 	margin-left: 1rem;
 	color: var(--grayscale-600, #2b3674);
 
