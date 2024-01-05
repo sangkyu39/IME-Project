@@ -1,0 +1,21 @@
+#reservePage .reserveDiv {
+	width: 66.25rem;
+	height: 51.875rem;
+	flex-shrink: 0;
+	border-radius: 1.25rem;
+	background: var(--white, #fff);
+	padding: 3rem 48px 40px 48px;
+}
+
+#reservePage .title {
+	color: var(--grayscale-600, #2b3674);
+	text-align: left;
+	/* title1 */
+	font-family: "DM Sans", sans-serif;
+	font-size: 2.125rem;
+	font-style: normal;
+	font-weight: 700;
+	line-height: 2.625rem; /* 123.529% */
+	letter-spacing: -0.0425rem;
+	margin: 1rem 0 4rem 0;
+}
