@@ -16,6 +16,7 @@ const getColorForSection = (sectionPath, currentPath) => {
 
 const SiderBar = () => {
   const { pathname } = useLocation();
+
   const onClickLentMyHomeBtn = () => {
     window.location.href = "/mypage";
   };
@@ -32,8 +33,21 @@ const SiderBar = () => {
     localStorage.clear();
     window.location.href = "/";
   };
+
   const onClickAdminBtn = () => {
     window.location.href = "/admin";
+  };
+
+  const onClickStudentManagement = () => {
+    window.location.href = "/admin/studentManagement";
+  };
+
+  const onClickLockerManagement = () => {
+    window.location.href = "/admin/lockerManagement";
+  };
+
+  const onClickDepartmentManagement = () => {
+    window.location.href = "/admin/departmentManagement";
   };
 
   return (
@@ -92,11 +106,13 @@ const SiderBar = () => {
           </div>
           로그아웃
         </SectionStyled>
+
         <SectionStyled
           active={pathname.includes("/admin")}
           onClick={onClickAdminBtn}
           style={{
             color: getColorForSection("/admin", pathname),
+            marginBottom: "1%",
           }}
         >
           <div>
@@ -104,6 +120,48 @@ const SiderBar = () => {
           </div>
           어드민
         </SectionStyled>
+
+        {pathname.includes("/admin") && (
+          <>
+            <SectionStyled
+              onClick={onClickStudentManagement}
+              style={{
+                color: getColorForSection(
+                  "/admin/student-management",
+                  pathname
+                ),
+                marginLeft: "48%",
+                marginBottom: "1%",
+                marginTop: "1%",
+              }}
+            >
+              학생관리
+            </SectionStyled>
+            <SectionStyled
+              onClick={onClickLockerManagement}
+              style={{
+                color: getColorForSection("/admin/locker-management", pathname),
+                marginLeft: "48%",
+                marginBottom: "1%",
+              }}
+            >
+              사물함 관리
+            </SectionStyled>
+            <SectionStyled
+              onClick={onClickDepartmentManagement}
+              style={{
+                color: getColorForSection(
+                  "/admin/department-management",
+                  pathname
+                ),
+                marginLeft: "48%",
+                marginBottom: "1%",
+              }}
+            >
+              학과 관리
+            </SectionStyled>
+          </>
+        )}
       </SectionWrap>
     </SiderBarStyled>
   );
