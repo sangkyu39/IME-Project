@@ -75,40 +75,48 @@ function Reserve() {
 								}}>
 								{major}
 							</p>
-							{lockerName.map(function (info, i) {
-								return (
-									<p
-										className="lockerName"
-										style={{
-											color: showLocker === i ? "#2B3674" : "#C9D2EB",
-											userSelect: "none",
-										}}
-										onClick={() => {
-											changeShowLocker(i);
-										}}>
-										{info}
-									</p>
-								);
-							})}
+							{lockerInfo ? (
+								lockerName.map(function (info, i) {
+									return (
+										<p
+											className="lockerName"
+											style={{
+												color: showLocker === i ? "#2B3674" : "#C9D2EB",
+												userSelect: "none",
+											}}
+											onClick={() => {
+												changeShowLocker(i);
+											}}>
+											{info}
+										</p>
+									);
+								})
+							) : (
+								<></>
+							)}
 						</div>
 						{/* 사물함 배치 및 예약  */}
 						<div className="lockerBoxDiv">
-							{[...Array(showCol)].map(function (info, col) {
-								return (
-									<div>
-										{[...Array(showRow)].map(function (info, row) {
-											return (
-												<div className="lockerBox">
-													<span className="lockerBoxNum">
-														{col}
-														{row}
-													</span>
-												</div>
-											);
-										})}
-									</div>
-								);
-							})}
+							{lockerInfo ? (
+								[...Array(showCol)].map(function (info, col) {
+									return (
+										<div>
+											{[...Array(showRow)].map(function (info, row) {
+												return (
+													<div className="lockerBox">
+														<span className="lockerBoxNum">
+															{col}
+															{row}
+														</span>
+													</div>
+												);
+											})}
+										</div>
+									);
+								})
+							) : (
+								<></>
+							)}
 						</div>
 					</div>
 				</div>
