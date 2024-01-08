@@ -11,9 +11,11 @@ function Reserve() {
 	const lockerURL = `http://54.180.70.111:8081/api/v2/users/${userObj.userId}/majors/lockers`;
 
 	const [major, setMajor] = useState("시각디자인학과");
+	const [lockerInfo, setLockerInfo] = useState();
+	const [lockerName, setLockerName] = useState();
 
 	async function getLockerInfo() {
-		axios
+		await axios
 			.get(lockerURL, {
 				headers: {
 					AccessToken: userObj.accessToken,
@@ -22,6 +24,11 @@ function Reserve() {
 			})
 			.then((res) => {
 				console.log(res);
+				setLockerInfo(res.data.result.lokerInfo);
+				if (lockerInfo) {
+					let copyLockerName = lockerInfo.map((i) => i.name);
+					setLockerName(copyLockerName);
+				}
 			})
 			.catch((err) => {
 				console.log(err);
@@ -31,28 +38,11 @@ function Reserve() {
 		getLockerInfo();
 	}, []);
 
-	const [lockerinfo, setLockerInfo] = useState([
-		{
-			locker: {
-				endReservationTime: "2024-01-06T12:35:27.809Z",
-				lockerName: "",
-				permitStates: ["ATTEND"],
-				permitTiers: ["APPLICANT"],
-				startReservationTime: "2024-01-06T12:35:27.809Z",
-				totalColumn: "10",
-				totalRow: "6",
-			},
-			lockerDetail: [
-				{
-					column_num: "string",
-					lockerDetailStatus: "BROKEN",
-					locker_num: "string",
-					row_num: "string",
-				},
-			],
-		},
-	]);
-	const [lockerNameInfo, setLockserNameInfo] = useState(["센터 b107사물함", "충 204사물함"]);
+	function changeShowLocker(e) {
+		setShowLocker(e);
+		setShowCol(e);
+		setShowRow(e);
+	}
 	const [showLocker, setShowLocker] = useState(0);
 	const [showCol, setShowCol] = useState(10);
 	const [showRow, setShowRow] = useState(5);
@@ -85,7 +75,7 @@ function Reserve() {
 								}}>
 								{major}
 							</p>
-							{lockerNameInfo.map(function (info, i) {
+							{lockerName.map(function (info, i) {
 								return (
 									<p
 										className="lockerName"
@@ -94,7 +84,7 @@ function Reserve() {
 											userSelect: "none",
 										}}
 										onClick={() => {
-											setShowLocker(i);
+											changeShowLocker(i);
 										}}>
 										{info}
 									</p>

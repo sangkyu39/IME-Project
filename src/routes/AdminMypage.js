@@ -10,9 +10,32 @@ import uploadCloud from "../assets/upload-cloud.svg";
 import downloadCloudGray from "../assets/download-cloud-gray.svg";
 import upArrow from "../assets/up_arrow.svg";
 import downArrow from "../assets/down_arrow.svg";
+import axios from "axios";
+import { getSuggestedQuery } from "@testing-library/react";
 
 function AdminMypage() {
-	// const downloadLink = "srcassetsstudentForm.xlsx";
+	const userObj = JSON.parse(localStorage.getItem("userObj"));
+	const studentInfoURL = "http://54.180.70.111:8081/admin/api/v2/users/?page=1";
+
+	async function getStudentInfo() {
+		await axios
+			.get(studentInfoURL, {
+				headers: {
+					AccessToken: userObj.accessToken,
+					RefreshToken: userObj.refreshToken,
+				},
+			})
+			.then((res) => {
+				console.log(res);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	}
+
+	useEffect(() => {
+		getStudentInfo();
+	}, []);
 	const [major, setMajor] = useState("시각디자인학과");
 	const [studentInfo, setStudentInfo] = useState([
 		{ name: "조예린", id: "19011721", num: "12", state: "재학", pay: true, admin: false },
