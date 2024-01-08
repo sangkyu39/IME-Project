@@ -1,14 +1,35 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import Sidebar from "../components/Sidebar";
 import styled from "styled-components";
 import React, { useState, useEffect } from "react";
 import Modal from "react-bootstrap/Modal";
 import "./Reserve.css";
+import axios from "axios";
 
 function Reserve() {
 	const userObj = JSON.parse(localStorage.getItem("userObj"));
-	const userId = userObj.userId;
+	const lockerURL = `http://54.180.70.111:8081/api/v2/users/${userObj.userId}/majors/lockers`;
 
 	const [major, setMajor] = useState("시각디자인학과");
+
+	async function getLockerInfo() {
+		axios
+			.get(lockerURL, {
+				headers: {
+					AccessToken: userObj.accessToken,
+					RefreshToken: userObj.refreshToken,
+				},
+			})
+			.then((res) => {
+				console.log(res);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	}
+	useEffect(() => {
+		getLockerInfo();
+	}, []);
 
 	const [lockerinfo, setLockerInfo] = useState([
 		{
