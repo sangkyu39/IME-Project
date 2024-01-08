@@ -39,10 +39,13 @@ function Login() {
 					console.log(res);
 					const userObj = res.data.result;
 					localStorage.setItem("userObj", JSON.stringify(userObj));
-					navigate("/mypage");
+					if (res.status === 200) {
+						navigate("/mypage");
+					}
 				})
 				.catch((err) => {
 					console.log(err);
+					setIsCorrect(false);
 				});
 		}
 	};
