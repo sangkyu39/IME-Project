@@ -9,7 +9,7 @@ function Login() {
 	const [studentId, setStudentId] = useState("");
 	const [password, setPassword] = useState("");
 	const [isCorrect, setIsCorrect] = useState(true);
-	const loginURL = "";
+	const loginURL = "http://54.180.70.111:8081/api/v2/auth/login";
 	const onChange = (e) => {
 		const {
 			target: { name, value },
@@ -33,10 +33,17 @@ function Login() {
 				pw: password,
 			};
 
-			// axios.post(loginURL, formData).then((res) => {
-			// 	console.log(res.status);
-			// });
-			navigate("/mypage");
+			axios
+				.post(loginURL, formData)
+				.then((res) => {
+					console.log(res);
+					const userObj = res.data.result;
+					localStorage.setItem("userObj", JSON.stringify(userObj));
+					navigate("/mypage");
+				})
+				.catch((err) => {
+					console.log(err);
+				});
 		}
 	};
 	return (

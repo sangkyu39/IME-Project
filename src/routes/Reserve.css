@@ -1,6 +1,5 @@
 #reservePage .reserveDiv {
 	width: 66.25rem;
-	height: 51.875rem;
 	flex-shrink: 0;
 	border-radius: 1.25rem;
 	background: var(--white, #fff);
@@ -18,4 +17,48 @@
 	line-height: 2.625rem; /* 123.529% */
 	letter-spacing: -0.0425rem;
 	margin: 1rem 0 4rem 0;
+}
+
+#reservePage .lockerName {
+	display: inline-block;
+	/* title2 */
+	margin-left: 1rem;
+	font-family: Pretendard;
+	font-size: 1.5rem;
+	font-style: normal;
+	font-weight: 700;
+	line-height: normal;
+	letter-spacing: -0.03rem;
+}
+
+#reservePage .lockerBox {
+	width: 5rem;
+	height: 5rem;
+	padding: 1.8125rem 2.1875rem;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 0.5rem;
+	flex-shrink: 0;
+	border-radius: 0.75rem;
+	background: var(--background, #f4f7fe);
+	margin: 0.1rem;
+}
+
+#reservePage .lockerBoxNum {
+	color: var(--grayscale-300, #a3aed0);
+	text-align: center;
+
+	/* title4 */
+	font-family: Pretendard;
+	font-size: 1.125rem;
+	font-style: normal;
+	font-weight: 700;
+	line-height: normal;
+}
+
+#reservePage .lockerBoxDiv {
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
