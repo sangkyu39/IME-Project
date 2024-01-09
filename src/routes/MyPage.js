@@ -1,8 +1,60 @@
 import styled from "styled-components";
 import Sidebar from "../components/Sidebar";
 import InfoImg from "../assets/MyInfo.png";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 function MyPage() {
+  const [userId, setUserId] = useState("");
+  const [userName, setUserName] = useState("");
+  const [majorDetail, setMajorDetail] = useState("");
+  const [studentNum, setStudentNum] = useState("");
+  const [reservedLockerName, setReservedLockerName] = useState("");
+  const [reservedLockerNum, setReservedLockerNum] = useState("");
+  const [time, setTime] = useState("");
+
+  useEffect(() => {
+    const storedUserObj = localStorage.getItem("userObj");
+
+    if (storedUserObj) {
+      const parsedUserObj = JSON.parse(storedUserObj);
+      setUserId(parsedUserObj.userId);
+
+      axios
+        .get(`http://54.180.70.111:8081/api/v2/users/${parsedUserObj.userId}`, {
+          headers: {
+            accessToken: parsedUserObj.accessToken,
+          },
+        })
+        .then((response) => {
+          console.log("Axios response:", response);
+
+          const data = response.data;
+          if (data.result.userName) {
+            setUserName(data.result.userName);
+            setMajorDetail(data.result.majorDetail);
+            setStudentNum(data.result.studentNum);
+            setReservedLockerName(data.result.reservedLockerName);
+            setReservedLockerNum(data.result.reservedLockerNum);
+            setTime(data.time);
+            console.log(
+              "UserName from Axios GET request:",
+              data.result.userName,
+              data.time
+            );
+          } else {
+            console.error(
+              "Invalid data structure in Axios GET response:",
+              data
+            );
+          }
+        })
+        .catch((error) => {
+          console.error("Error during Axios GET request:", error);
+        });
+    }
+  }, []);
+
   return (
     <MyPageStyled>
       <Sidebar />
@@ -14,16 +66,28 @@ function MyPage() {
               내 정보
               <div
                 style={{
-                  marginTop: "35px",
+                  marginTop: "5px",
                   display: "flex",
                   justifyContent: "space-between",
                 }}
               >
                 <InfoImage src={InfoImg} alt="내 정보 이미지" />
                 <div style={{ width: "60%" }}>
-                  <Info>이름</Info>
-                  <Info>학과</Info>
-                  <Info>학생회비</Info>
+                  <Info>
+                    이름<h2>{userName}</h2>
+                  </Info>
+                  <Info>
+                    학과<h2>{majorDetail}</h2>
+                  </Info>
+                  <Info>
+                    학번<h2>{studentNum}</h2>
+                  </Info>
+                  <Info>
+                    학생회비
+                    <h2 style={{ color: "var(--primary-300, #F16686)" }}>
+                      납부
+                    </h2>
+                  </Info>
                 </div>
               </div>
             </InfoText>
@@ -39,9 +103,15 @@ function MyPage() {
                   flexDirection: "column",
                 }}
               >
-                <Info>위치</Info>
-                <Info>번호</Info>
-                <Info>사용기간</Info>
+                <Info>
+                  위치<h2>센터 b107 사물함{reservedLockerName}</h2>
+                </Info>
+                <Info>
+                  번호<h2>55{reservedLockerNum}</h2>
+                </Info>
+                <Info>
+                  사용기간<h2>{time}</h2>
+                </Info>
               </div>
             </InfoText>
           </InfoBox>
@@ -98,8 +168,15 @@ const ContentContainer = styled.div`
 `;
 
 const PageText = styled.div`
+  @font-face {
+    font-family: "Pretendard-Regular";
+    src: url("https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff")
+      format("woff");
+    font-weight: 400;
+    font-style: normal;
+  }
   color: var(--grayscale-600, #2b3674);
-  font-family: "DM Sans", sans-serif;
+  font-family: Pretendard-Regular;
   font-size: 34px;
   font-style: normal;
   font-weight: 700;
@@ -143,7 +220,6 @@ const InfoText = styled.div`
 `;
 
 const Info = styled.div`
-  margin-top: 10px;
   display: flex;
   align-items: center;
   color: var(--grayscale-400, #7883a6);
@@ -153,7 +229,19 @@ const Info = styled.div`
   font-weight: 700;
   line-height: normal;
   letter-spacing: -0.32px;
-  padding: 5px;
+
+  h2 {
+    color: var(--grayscale-600, #2b3674);
+    font-family: Pretendard;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    letter-spacing: -0.32px;
+    text-align: center;
+    margin-top: 7px;
+    margin-left: 50px;
+  }
 `;
 
 const InfoImage = styled.img`
@@ -163,6 +251,7 @@ const InfoImage = styled.img`
   border: 2px solid var(--primary-200, #f699ae);
   background: var(--primary-50, #fde6eb);
   mix-blend-mode: multiply;
+  margin-top: 18px;
 `;
 
 const InfoBoxWithButton = styled(InfoBox)`

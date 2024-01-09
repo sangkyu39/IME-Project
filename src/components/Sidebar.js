@@ -185,7 +185,6 @@ const TitleStyled = styled.div`
   height: 138px;
   cursor: pointer;
   text-decoration: none;
-  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
 `;
 
 const TitleSVG = styled.svg`
@@ -203,6 +202,13 @@ const SectionWrap = styled.div`
 `;
 
 const SectionStyled = styled.div`
+  @font-face {
+    font-family: "Pretendard-Regular";
+    src: url("https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff")
+      format("woff");
+    font-weight: 400;
+    font-style: normal;
+  }
   width: 252px;
   height: 62px;
   background: ${(props) =>
