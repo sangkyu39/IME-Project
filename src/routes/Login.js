@@ -36,7 +36,6 @@ function Login() {
 			axios
 				.post(loginURL, formData)
 				.then((res) => {
-					console.log(res);
 					const userObj = res.data.result;
 					localStorage.setItem("userObj", JSON.stringify(userObj));
 					if (res.status === 200) {
@@ -44,7 +43,6 @@ function Login() {
 					}
 				})
 				.catch((err) => {
-					console.log(err);
 					setIsCorrect(false);
 				});
 		}
