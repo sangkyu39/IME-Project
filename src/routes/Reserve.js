@@ -19,7 +19,6 @@ function Reserve() {
 			.get(lockerURL, {
 				headers: {
 					AccessToken: userObj.accessToken,
-					RefreshToken: userObj.refreshToken,
 				},
 			})
 			.then((res) => {
