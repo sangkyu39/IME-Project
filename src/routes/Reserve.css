@@ -16,7 +16,7 @@
 	font-weight: 700;
 	line-height: 2.625rem; /* 123.529% */
 	letter-spacing: -0.0425rem;
-	margin: 1rem 0 4rem 0;
+	margin: 3rem 0 4rem 0;
 }
 
 #reservePage .lockerName {
@@ -61,4 +61,98 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
+}
+
+.modalTitle {
+	color: var(--grayscale-600, #2b3674);
+	text-align: center;
+	margin-bottom: 1rem;
+
+	/* title2 */
+	font-family: Pretendard;
+	font-size: 1.5rem;
+	font-style: normal;
+	font-weight: 700;
+	line-height: normal;
+	letter-spacing: -0.03rem;
+}
+
+.modalDetail {
+	color: var(--grayscale-300, #a3aed0);
+	text-align: center;
+
+	/* body1 */
+	font-family: Pretendard;
+	font-size: 1rem;
+	font-style: normal;
+	font-weight: 700;
+	line-height: normal;
+	letter-spacing: -0.02rem;
+	margin-bottom: 2.5rem;
+}
+
+.modal-content {
+	width: 32.5rem;
+	height: 16.5rem;
+	flex-shrink: 0;
+	border-radius: 2.5rem;
+	background: #fff;
+	text-align: center;
+	padding-top: 3.75rem;
+	/* margin-bottom: 2.5rem; */
+}
+
+.modal-body {
+	padding: 0 0 0 0;
+}
+.modalRedBTN {
+	margin: auto;
+	margin: 0 0.625rem;
+	border: none;
+	display: inline-block;
+	height: 3.75rem;
+	padding: 0.625rem 0.5rem;
+	justify-content: center;
+	align-items: center;
+	gap: 0.625rem;
+	flex-shrink: 0;
+	border-radius: 1.25rem;
+	background: var(--primary-400, #ed335d);
+
+	color: #fff;
+	text-align: center;
+
+	/* body1 */
+	font-family: Pretendard;
+	font-size: 1rem;
+	font-style: normal;
+	font-weight: 700;
+	line-height: normal;
+	letter-spacing: -0.02rem;
+}
+
+.modalWhiteBTN {
+	margin: 0 0.625rem;
+	border: none;
+	display: inline-block;
+	width: 11.875rem;
+	height: 3.75rem;
+	padding: 0.625rem 0.5rem;
+	justify-content: center;
+	align-items: center;
+	gap: 0.625rem;
+	flex-shrink: 0;
+	border-radius: 1.25rem;
+	background: var(--background, #f4f7fe);
+
+	color: var(--grayscale-500, #596686);
+	text-align: center;
+
+	/* body1 */
+	font-family: Pretendard;
+	font-size: 1rem;
+	font-style: normal;
+	font-weight: 700;
+	line-height: normal;
+	letter-spacing: -0.02rem;
 }
