@@ -23,7 +23,6 @@ function Login() {
 	};
 
 	const login = (e) => {
-		e.preventDefault();
 		if (!studentId || !password) {
 			setIsCorrect(false);
 			return;
@@ -79,6 +78,11 @@ function Login() {
 					required
 					value={password}
 					onChange={onChange}
+					onKeyDown={(e) => {
+						if (e.key === "Enter") {
+							login();
+						}
+					}}
 				/>{" "}
 				<br />
 				<p className="forgetPW" onClick={forgetPW}>
