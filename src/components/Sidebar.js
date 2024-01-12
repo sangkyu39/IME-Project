@@ -50,6 +50,10 @@ const SiderBar = () => {
     window.location.href = "/admin/departmentManagement";
   };
 
+  const onClickMaster = () => {
+    window.location.href = "/master";
+  };
+
   return (
     <SiderBarStyled>
       <LinkStyled to="/mypage">
@@ -62,7 +66,6 @@ const SiderBar = () => {
       <SectionWrap>
         <SectionStyled
           active={pathname.includes("/mypage")}
-          fill={true}
           onClick={onClickLentMyHomeBtn}
           style={{
             color: getColorForSection("/mypage", pathname),
@@ -126,10 +129,7 @@ const SiderBar = () => {
             <SectionStyled
               onClick={onClickStudentManagement}
               style={{
-                color: getColorForSection(
-                  "/admin/student-management",
-                  pathname
-                ),
+                color: getColorForSection("/admin", pathname),
                 marginLeft: "48%",
                 marginBottom: "1%",
                 marginTop: "1%",
@@ -162,6 +162,19 @@ const SiderBar = () => {
             </SectionStyled>
           </>
         )}
+        <SectionStyled
+          active={pathname.includes("/master")}
+          onClick={onClickMaster}
+          style={{
+            color: getColorForSection("/master", pathname),
+            marginTop: "5%",
+          }}
+        >
+          <div>
+            <Admin />
+          </div>
+          마스터
+        </SectionStyled>
       </SectionWrap>
     </SiderBarStyled>
   );
@@ -216,7 +229,7 @@ const SectionStyled = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
   font-size: 18px;
   font-weight: 700;
   font-family: Pretendard-Regular;

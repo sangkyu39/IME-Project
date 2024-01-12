@@ -12,6 +12,8 @@ function MyPage() {
   const [reservedLockerName, setReservedLockerName] = useState("");
   const [reservedLockerNum, setReservedLockerNum] = useState("");
   const [time, setTime] = useState("");
+  const [userTier, setUserTier] = useState("");
+  const [role, setRole] = useState("");
 
   useEffect(() => {
     const storedUserObj = localStorage.getItem("userObj");
@@ -19,7 +21,7 @@ function MyPage() {
     if (storedUserObj) {
       const parsedUserObj = JSON.parse(storedUserObj);
       setUserId(parsedUserObj.userId);
-
+      setRole(parsedUserObj.role);
       axios
         .get(`http://54.180.70.111:8081/api/v2/users/${parsedUserObj.userId}`, {
           headers: {
@@ -37,10 +39,12 @@ function MyPage() {
             setReservedLockerName(data.result.reservedLockerName);
             setReservedLockerNum(data.result.reservedLockerNum);
             setTime(data.time);
+            setUserTier(data.result.userTier);
             console.log(
               "UserName from Axios GET request:",
               data.result.userName,
-              data.time
+              data.time,
+              data.result.userTier
             );
           } else {
             console.error(
@@ -57,7 +61,7 @@ function MyPage() {
 
   return (
     <MyPageStyled>
-      <Sidebar />
+      <Sidebar role={role} />
       <ContentContainer>
         <PageText>마이페이지</PageText>
         <DivStyled>
@@ -74,19 +78,60 @@ function MyPage() {
                 <InfoImage src={InfoImg} alt="내 정보 이미지" />
                 <div style={{ width: "60%" }}>
                   <Info>
-                    이름<h2>{userName}</h2>
+                    이름
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "left",
+                        width: "145px",
+                      }}
+                    >
+                      <h2>{userName}</h2>
+                    </div>
                   </Info>
                   <Info>
-                    학과<h2>{majorDetail}</h2>
+                    학과
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "left",
+                        width: "145px",
+                      }}
+                    >
+                      <h2>{majorDetail}</h2>
+                    </div>
                   </Info>
                   <Info>
-                    학번<h2>{studentNum}</h2>
+                    학번
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "left",
+                        width: "145px",
+                      }}
+                    >
+                      <h2>{studentNum}</h2>
+                    </div>
                   </Info>
                   <Info>
                     학생회비
-                    <h2 style={{ color: "var(--primary-300, #F16686)" }}>
-                      납부
-                    </h2>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "left",
+                        width: "145px",
+                      }}
+                    >
+                      <h2 style={{ color: "var(--primary-300, #F16686)" }}>
+                        {userTier === "NON_MEMBER"
+                          ? "미납"
+                          : userTier === "MEMBER"
+                          ? "납부"
+                          : userTier === "APPLICANT"
+                          ? "납부신청 승인대기중"
+                          : ""}
+                      </h2>
+                    </div>
                   </Info>
                 </div>
               </div>
@@ -104,13 +149,40 @@ function MyPage() {
                 }}
               >
                 <Info>
-                  위치<h2>센터 b107 사물함{reservedLockerName}</h2>
+                  위치
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "left",
+                      width: "295px",
+                    }}
+                  >
+                    <h2>센터 b107 사물함{reservedLockerName}</h2>
+                  </div>
                 </Info>
                 <Info>
-                  번호<h2>55{reservedLockerNum}</h2>
+                  번호
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "left",
+                      width: "295px",
+                    }}
+                  >
+                    <h2>55{reservedLockerNum}</h2>
+                  </div>
                 </Info>
                 <Info>
-                  사용기간<h2>{time}</h2>
+                  사용기간
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "left",
+                      width: "295px",
+                    }}
+                  >
+                    <h2>{time}</h2>
+                  </div>
                 </Info>
               </div>
             </InfoText>
@@ -206,6 +278,7 @@ const InfoBox = styled.div`
   flex-shrink: 0;
   border-radius: 20px;
   background: var(--white, #fff);
+  margin-top: 2%;
 `;
 
 const InfoText = styled.div`
@@ -229,6 +302,7 @@ const Info = styled.div`
   font-weight: 700;
   line-height: normal;
   letter-spacing: -0.32px;
+  justify-content: space-between;
 
   h2 {
     color: var(--grayscale-600, #2b3674);
@@ -238,9 +312,7 @@ const Info = styled.div`
     font-weight: 700;
     line-height: normal;
     letter-spacing: -0.32px;
-    text-align: center;
     margin-top: 7px;
-    margin-left: 50px;
   }
 `;
 
