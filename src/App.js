@@ -13,6 +13,7 @@ function App() {
 					<Route path="/" element={<Login />} />
 					<Route path="/mypage" element={<MyPage />} />
 					<Route path="/admin" element={<AdminMypage />} />
+					<Route path="/admin/studentManagement" element={<AdminMypage />} />
 					<Route path="/reserve" element={<Reserve />} />
 				</Routes>
 			</Router>

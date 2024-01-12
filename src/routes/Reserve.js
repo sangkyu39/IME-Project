@@ -28,6 +28,7 @@ function Reserve() {
 			.then((res) => {
 				console.log(res);
 				setLockerInfo(res.data.result.lokerInfo);
+				console.log(lockerInfo);
 				// locker 정보가 있는 경우에만 위치 목록 생성
 				if (lockerInfo) {
 					let copyLockerName = lockerInfo.map((i) => i.name);

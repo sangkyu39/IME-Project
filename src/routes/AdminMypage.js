@@ -15,14 +15,15 @@ import { getSuggestedQuery } from "@testing-library/react";
 
 function AdminMypage() {
 	const userObj = JSON.parse(localStorage.getItem("userObj"));
-	const studentInfoURL = "http://54.180.70.111:8081/admin/api/v2/users";
+	const studentInfoURL = `http://54.180.70.111:8081/admin/api/v2/majors/${userObj.majorId}/users`;
+	const [pageNum, setPageNum] = useState(0);
 
 	async function getStudentInfo() {
 		await axios
 			.get(studentInfoURL, {
 				params: {
-					page: 0,
-					search: "",
+					majorId: userObj.majorId,
+					page: pageNum,
 				},
 				headers: {
 					AccessToken: userObj.accessToken,
