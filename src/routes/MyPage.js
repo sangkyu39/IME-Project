@@ -21,7 +21,7 @@ function MyPage() {
 			setUserId(parsedUserObj.userId);
 
 			axios
-				.get(`http://54.180.70.111:8081/api/v2/users/${parsedUserObj.userId}`, {
+				.get(`http://54.180.70.111:8083/api/v2/users/${parsedUserObj.userId}`, {
 					headers: {
 						accessToken: parsedUserObj.accessToken,
 					},

@@ -15,8 +15,8 @@ import { getSuggestedQuery } from "@testing-library/react";
 
 function AdminMypage() {
 	const userObj = JSON.parse(localStorage.getItem("userObj"));
-	const studentInfoURL = `http://54.180.70.111:8081/admin/api/v2/majors/${userObj.majorId}/users`;
-	const fileUploadURL = `http://54.180.70.111:8081/admin/api/v2/users/${userObj.userId}/file`;
+	const studentInfoURL = `http://54.180.70.111:8083/admin/api/v2/majors/${userObj.majorId}/users`;
+	const fileUploadURL = `http://54.180.70.111:8083/admin/api/v2/users/${userObj.userId}/file`;
 	const [pageNum, setPageNum] = useState(0);
 	async function getStudentInfo() {
 		await axios
@@ -50,6 +50,9 @@ function AdminMypage() {
 					AccessToken: userObj.accessToken,
 				},
 				formData,
+			})
+			.then((res) => {
+				console.log(res);
 			})
 			.catch((err) => {
 				console.log(err);
