@@ -16,8 +16,8 @@ import { getSuggestedQuery } from "@testing-library/react";
 function AdminMypage() {
 	const userObj = JSON.parse(localStorage.getItem("userObj"));
 	const studentInfoURL = `http://54.180.70.111:8081/admin/api/v2/majors/${userObj.majorId}/users`;
+	const fileUploadURL = `http://54.180.70.111:8081/admin/api/v2/users/${userObj.userId}/file`;
 	const [pageNum, setPageNum] = useState(0);
-
 	async function getStudentInfo() {
 		await axios
 			.get(studentInfoURL, {
@@ -38,6 +38,23 @@ function AdminMypage() {
 			});
 	}
 
+	const uploadFile = async (e) => {
+		const file = e.target.files[0];
+
+		const formData = {
+			membershipFile: file,
+		};
+		await axios
+			.post(fileUploadURL, {
+				headers: {
+					AccessToken: userObj.accessToken,
+				},
+				formData,
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	};
 	useEffect(() => {
 		getStudentInfo();
 	}, []);
@@ -100,27 +117,40 @@ function AdminMypage() {
 								{studentInfo ? (
 									<>
 										<img src={downloadCoud} alt="downloadCloud" />
-										<span>데이터 내보내기</span>
+										<label for="download">데이터 내보내기</label>
+										<input id="download" type="file" name="file " accept=".xlsx .csv"></input>
 									</>
 								) : (
 									<>
 										<img src={downloadCloudGray} alt="uploadCloudGray" />
-										<span
+										<label for="uploadG">데이터 내보내기</label>
+										<input
+											id="uploadG"
+											type="file"
+											name="file "
+											accept=".xlsx .csv"
 											style={{
 												color: "var(--grayscale-300, #A3AED0)",
-											}}>
-											데이터 내보내기
-										</span>
+											}}></input>
 									</>
 								)}
 							</div>
 							<div className="dataload">
 								<img src={uploadCloud} alt="uploadCloud" />
-								<span>데이터 가져오기</span>
+								<label for="upload">데이터 가져오기</label>
+								<input
+									onChange={(e) => {
+										uploadFile(e);
+									}}
+									id="upload"
+									type="file"
+									name="file "
+									accept=".xlsx .csv"></input>
 							</div>
 							<div className="dataload">
 								<img src={download} alt="download" />
-								<span>양식 다운받기</span>
+								<label for="dataload">양식 다운받기</label>
+								<input id="dataload" type="file" name="file " accept=".xlsx .csv"></input>
 							</div>
 						</div>
 						<table className="infoTable">
