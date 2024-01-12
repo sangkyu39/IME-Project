@@ -15,14 +15,17 @@ import { getSuggestedQuery } from "@testing-library/react";
 
 function AdminMypage() {
 	const userObj = JSON.parse(localStorage.getItem("userObj"));
-	const studentInfoURL = "http://54.180.70.111:8081/admin/api/v2/users/?page=0";
+	const studentInfoURL = "http://54.180.70.111:8081/admin/api/v2/users";
 
 	async function getStudentInfo() {
 		await axios
 			.get(studentInfoURL, {
+				params: {
+					page: 0,
+					search: "",
+				},
 				headers: {
 					AccessToken: userObj.accessToken,
-					RefreshToken: userObj.refreshToken,
 				},
 			})
 			.then((res) => {
@@ -37,7 +40,7 @@ function AdminMypage() {
 	useEffect(() => {
 		getStudentInfo();
 	}, []);
-	const [major, setMajor] = useState("시각디자인학과");
+	const [major, setMajor] = useState(localStorage.getItem("major"));
 	const [studentInfo, setStudentInfo] = useState();
 	const [idAsc, setIdAsc] = useState(true);
 	const [searchId, setSearchId] = useState("");

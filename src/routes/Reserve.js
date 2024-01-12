@@ -11,7 +11,7 @@ function Reserve() {
 	const userObj = JSON.parse(localStorage.getItem("userObj"));
 	const lockerURL = `http://54.180.70.111:8081/api/v2/users/${userObj.userId}/majors/lockers`;
 
-	const [major, setMajor] = useState("시각디자인학과");
+	const [major, setMajor] = useState(localStorage.getItem("major"));
 	const [lockerInfo, setLockerInfo] = useState();
 	const [lockerName, setLockerName] = useState();
 	const [changeLockerModal, setChangeLockerModal] = useState(false);
@@ -28,6 +28,7 @@ function Reserve() {
 			.then((res) => {
 				console.log(res);
 				setLockerInfo(res.data.result.lokerInfo);
+				// locker 정보가 있는 경우에만 위치 목록 생성
 				if (lockerInfo) {
 					let copyLockerName = lockerInfo.map((i) => i.name);
 					setLockerName(copyLockerName);
@@ -37,10 +38,12 @@ function Reserve() {
 				console.log(err);
 			});
 	}
+
 	useEffect(() => {
 		getLockerInfo();
 	}, []);
 
+	// 보여지는 locker index 변경
 	function changeShowLocker(e) {
 		setShowLocker(e);
 		setShowCol(e);
