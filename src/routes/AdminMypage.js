@@ -58,6 +58,7 @@ function AdminMypage() {
 				console.log(err);
 			});
 	};
+
 	useEffect(() => {
 		getStudentInfo();
 	}, []);
@@ -77,6 +78,13 @@ function AdminMypage() {
 		setStudentInfo(copyInfo);
 	};
 
+	const fileDownload = () => {
+		const fileURL = "sample.xlsx";
+		const link = document.createElement("a");
+		link.href = fileURL;
+		link.download = "sample.xlsx";
+		link.click();
+	};
 	return (
 		<MyPageStyled>
 			<Sidebar />
@@ -126,15 +134,13 @@ function AdminMypage() {
 								) : (
 									<>
 										<img src={downloadCloudGray} alt="uploadCloudGray" />
-										<label for="uploadG">데이터 내보내기</label>
-										<input
-											id="uploadG"
-											type="file"
-											name="file "
-											accept=".xlsx .csv"
+										<label
+											for="uploadG"
 											style={{
 												color: "var(--grayscale-300, #A3AED0)",
-											}}></input>
+											}}>
+											데이터 내보내기
+										</label>
 									</>
 								)}
 							</div>
@@ -147,33 +153,37 @@ function AdminMypage() {
 									}}
 									id="upload"
 									type="file"
-									name="file "
-									accept=".xlsx .csv"></input>
+									name="file"></input>
 							</div>
 							<div className="dataload">
 								<img src={download} alt="download" />
-								<label for="dataload">양식 다운받기</label>
-								<input id="dataload" type="file" name="file " accept=".xlsx .csv"></input>
+								<label for="dataload" onClick={fileDownload}>
+									양식 다운받기
+								</label>
 							</div>
 						</div>
 						<table className="infoTable">
 							{/* 목록 */}
 							<thead>
 								<th>이름</th>
-								<th>
-									<span
-										onClick={() => {
-											setIdAsc(!idAsc);
-											handleAsc();
-										}}>
-										학번
-									</span>
-									<img src={idAsc ? upArrow : downArrow} alt="arrow" />
+								<th
+									onClick={() => {
+										setIdAsc(!idAsc);
+										handleAsc();
+									}}>
+									<span>학번</span>
+									<img src={idAsc ? downArrow : upArrow} alt="arrow" />
 								</th>
 								<th>사물함 번호</th>
-								<th>상태</th>
-								<th>학생회비 납부</th>
-								<th>관리자 여부</th>
+								<th>
+									<span>상태</span>
+								</th>
+								<th>
+									<span>학생회비 납부</span>
+								</th>
+								<th>
+									<span>관리자 여부</span>
+								</th>
 							</thead>
 							{/* 내용 */}
 							<tbody>
