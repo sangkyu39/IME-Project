@@ -9,7 +9,7 @@
 #reservePage .title {
 	color: var(--grayscale-600, #2b3674);
 	text-align: left;
-	/* title1 */ 
+	/* title1 */
 	font-family: "DM Sans", sans-serif;
 	font-size: 2.125rem;
 	font-style: normal;
@@ -22,13 +22,21 @@
 #reservePage .lockerName {
 	display: inline-block;
 	/* title2 */
-	margin-left: 1rem;
+	margin-left: 2.25rem;
+	margin-bottom: 0;
 	font-family: Pretendard;
 	font-size: 1.5rem;
 	font-style: normal;
 	font-weight: 700;
 	line-height: normal;
 	letter-spacing: -0.03rem;
+}
+
+#reservePage .alertIMG {
+	display: inline-block;
+	position: relative;
+	vertical-align: top;
+	margin-left: 0.25rem;
 }
 
 #reservePage .lockerBox {
