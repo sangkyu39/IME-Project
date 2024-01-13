@@ -9,7 +9,8 @@ import axios from "axios";
 
 function Reserve() {
 	const userObj = JSON.parse(localStorage.getItem("userObj"));
-	const lockerURL = `http://54.180.70.111:8081/api/v2/users/${userObj.userId}/majors/lockers`;
+	const lockerURL = `http://54.180.70.111:8083/api/v2/users/${userObj.userId}/majors/lockers`;
+	const reserveURL = `http://54.180.70.111:8083/api/v2/users/${userObj.userId}/majors/${userObj.majorId}/lockerDetail/`;
 
 	const [major, setMajor] = useState(localStorage.getItem("major"));
 	const [lockerInfo, setLockerInfo] = useState();
@@ -17,6 +18,13 @@ function Reserve() {
 	const [changeLockerModal, setChangeLockerModal] = useState(false);
 	const [alertReserveModal, setAlertReserveModal] = useState(false);
 	const [prevReserveModal, setPrevReserveModal] = useState(false);
+	const [colArr, setColArr] = useState();
+	const [rowArr, setRowArr] = useState();
+	const [showLocker, setShowLocker] = useState(0);
+	const [showCol, setShowCol] = useState(1);
+	const [showRow, setShowRow] = useState(1);
+	const [startTime, setStartTime] = useState(0);
+	const [endTime, setEndTime] = useState(0);
 
 	async function getLockerInfo() {
 		await axios
@@ -26,14 +34,12 @@ function Reserve() {
 				},
 			})
 			.then((res) => {
-				console.log(res);
-				setLockerInfo(res.data.result.lokerInfo);
-				console.log(lockerInfo);
-				// locker 정보가 있는 경우에만 위치 목록 생성
-				if (lockerInfo) {
-					let copyLockerName = lockerInfo.map((i) => i.name);
-					setLockerName(copyLockerName);
-				}
+				console.log(res.data.result.lockersInfo);
+				setLockerInfo(res.data.result.lockersInfo);
+				setLockerName(res.data.result.lockersInfo.map((i) => i.locker.name));
+				setStartTime(res.data.result.lockersInfo[0].locker.startReservationTime);
+				console.log(res.data.result.lockersInfo[0].locker.startReservationTime);
+				setEndTime(res.data.result.lockersInfo[0].locker.endReservationTime);
 			})
 			.catch((err) => {
 				console.log(err);
@@ -47,12 +53,35 @@ function Reserve() {
 	// 보여지는 locker index 변경
 	function changeShowLocker(e) {
 		setShowLocker(e);
-		setShowCol(e);
-		setShowRow(e);
+		setShowCol(lockerInfo[e].locker.totalColumn);
+		setShowRow(lockerInfo[e].locker.totalRow);
+		setStartTime(lockerInfo[e].locker.startResevationTime);
+		setEndTime(lockerInfo[e].locker.endResevationTime);
 	}
-	const [showLocker, setShowLocker] = useState(0);
-	const [showCol, setShowCol] = useState(10);
-	const [showRow, setShowRow] = useState(5);
+
+	async function reserve(e) {
+		let lockerDetailId = e;
+		let URL = reserveURL + lockerDetailId + "/reservations";
+		console.log(URL);
+		await axios
+			.post(URL, {
+				headers: {
+					AccessToken: userObj.accessToken,
+				},
+			})
+			.then((res) => {
+				setAlertReserveModal(true);
+			})
+			.catch((err) => {
+				setPrevReserveModal(true);
+				console.log(err);
+			});
+	}
+
+	useEffect(() => {
+		setColArr(Array.from({ length: showCol }, (_, index) => index));
+		setRowArr(Array.from({ length: showRow }, (_, index) => index));
+	}, [showRow, showCol]);
 
 	return (
 		<MyPageStyled>
@@ -81,18 +110,19 @@ function Reserve() {
 									marginLeft: "1.5rem",
 								}}
 								onClick={() => {
-									console.log("!!");
-									setChangeLockerModal(true);
-									setAlertReserveModal(true); //
-									setPrevReserveModal(true);
+									console.log(lockerName);
 								}}>
 								{major}
 							</p>
 							{/* 사물함 이름 리스트 출력 */}
-							{lockerInfo ? (
+							{lockerName ? (
 								lockerName.map(function (info, i) {
 									return (
-										<div>
+										<div
+											style={{
+												display: "inline",
+											}}
+											key={i}>
 											<p
 												className="lockerName"
 												style={{
@@ -104,7 +134,7 @@ function Reserve() {
 												}}>
 												{info}
 											</p>
-											<img src={alert} alt="alert" />
+											{/* <img src={alert} alt="alert" /> */}
 										</div>
 									);
 								})
@@ -115,15 +145,39 @@ function Reserve() {
 						{/* 사물함 배치 및 예약  */}
 						<div className="lockerBoxDiv">
 							{lockerInfo ? (
-								[...Array(showCol)].map(function (info, col) {
+								colArr.map(function (info, col) {
 									return (
-										<div>
-											{[...Array(showRow)].map(function (info, row) {
+										<div key={col}>
+											{rowArr.map(function (info, row) {
+												const locker = lockerInfo[showLocker].lockerDetail.find(
+													(item) =>
+														item.row_num === String(row + 1) && item.column_num === String(col + 1)
+												);
+												let num = locker ? locker.locker_num : 0;
 												return (
-													<div className="lockerBox">
-														<span className="lockerBoxNum">
-															{col}
-															{row}
+													<div
+														className="lockerBox"
+														style={{
+															background:
+																locker && locker.status === "NON_RESERVED"
+																	? "var(--background, #f4f7fe)"
+																	: "var(--primary-400, #ED335D)",
+														}}
+														key={row}
+														onClick={() => {
+															reserve(locker.id);
+
+															// setChangeLockerModal(true);
+														}}>
+														<span
+															style={{
+																color:
+																	locker && locker.status === "NON_RESERVED"
+																		? "var(--grayscale-300, #a3aed0)"
+																		: "white",
+															}}
+															className="lockerBoxNum">
+															{num}
 														</span>
 													</div>
 												);
@@ -151,9 +205,13 @@ function Reserve() {
 						</div>
 						<ChangeLockerModal
 							setChangeLockerModal={setChangeLockerModal}
+							place={"센"}
+							num={1}
 							changeLockerModal={changeLockerModal}></ChangeLockerModal>
 						<AlertReserveModal
 							setAlertReserveModal={setAlertReserveModal}
+							place={"센"}
+							num={1}
 							alertReserveModal={alertReserveModal}></AlertReserveModal>
 						<PrevReserveModal
 							setPrevReserveModal={setPrevReserveModal}
@@ -179,7 +237,7 @@ function ChangeLockerModal(props) {
 			centered>
 			<Modal.Body>
 				<p className="modalTitle">
-					{} 사물함 {}번으로 변경하시겠어요?
+					{props.place} 사물함 {props.num}번으로 변경하시겠어요?
 				</p>
 				<p className="modalDetail">기존의 사물함 예약 내역은 사라져요</p>
 				<div className="">
@@ -207,7 +265,7 @@ function AlertReserveModal(props) {
 			centered>
 			<Modal.Body>
 				<p className="modalTitle">
-					{} 사물함 {}번 예약이 완료되었어요.
+					{props.place} 사물함 {props.num}번 예약이 완료되었어요.
 				</p>
 				<p className="modalDetail">언제든 남아있는 사물함으로 변경이 가능해요.</p>
 				<button
