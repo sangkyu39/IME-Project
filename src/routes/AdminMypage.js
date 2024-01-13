@@ -15,9 +15,9 @@ import { getSuggestedQuery } from "@testing-library/react";
 
 function AdminMypage() {
 	const userObj = JSON.parse(localStorage.getItem("userObj"));
-	const studentInfoURL = `http://54.180.70.111:8081/admin/api/v2/majors/${userObj.majorId}/users`;
+	const studentInfoURL = `http://54.180.70.111:8083/admin/api/v2/majors/${userObj.majorId}/users`;
+	const fileUploadURL = `http://54.180.70.111:8083/admin/api/v2/users/${userObj.userId}/file`;
 	const [pageNum, setPageNum] = useState(0);
-
 	async function getStudentInfo() {
 		await axios
 			.get(studentInfoURL, {
@@ -38,6 +38,27 @@ function AdminMypage() {
 			});
 	}
 
+	const uploadFile = async (e) => {
+		const file = e.target.files[0];
+
+		const formData = {
+			membershipFile: file,
+		};
+		await axios
+			.post(fileUploadURL, {
+				headers: {
+					AccessToken: userObj.accessToken,
+				},
+				formData,
+			})
+			.then((res) => {
+				console.log(res);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	};
+
 	useEffect(() => {
 		getStudentInfo();
 	}, []);
@@ -57,6 +78,13 @@ function AdminMypage() {
 		setStudentInfo(copyInfo);
 	};
 
+	const fileDownload = () => {
+		const fileURL = "sample.xlsx";
+		const link = document.createElement("a");
+		link.href = fileURL;
+		link.download = "sample.xlsx";
+		link.click();
+	};
 	return (
 		<MyPageStyled>
 			<Sidebar />
@@ -100,47 +128,62 @@ function AdminMypage() {
 								{studentInfo ? (
 									<>
 										<img src={downloadCoud} alt="downloadCloud" />
-										<span>데이터 내보내기</span>
+										<label for="download">데이터 내보내기</label>
+										<input id="download" type="file" name="file " accept=".xlsx .csv"></input>
 									</>
 								) : (
 									<>
 										<img src={downloadCloudGray} alt="uploadCloudGray" />
-										<span
+										<label
+											for="uploadG"
 											style={{
 												color: "var(--grayscale-300, #A3AED0)",
 											}}>
 											데이터 내보내기
-										</span>
+										</label>
 									</>
 								)}
 							</div>
 							<div className="dataload">
 								<img src={uploadCloud} alt="uploadCloud" />
-								<span>데이터 가져오기</span>
+								<label for="upload">데이터 가져오기</label>
+								<input
+									onChange={(e) => {
+										uploadFile(e);
+									}}
+									id="upload"
+									type="file"
+									name="file"></input>
 							</div>
 							<div className="dataload">
 								<img src={download} alt="download" />
-								<span>양식 다운받기</span>
+								<label for="dataload" onClick={fileDownload}>
+									양식 다운받기
+								</label>
 							</div>
 						</div>
 						<table className="infoTable">
 							{/* 목록 */}
 							<thead>
 								<th>이름</th>
-								<th>
-									<span
-										onClick={() => {
-											setIdAsc(!idAsc);
-											handleAsc();
-										}}>
-										학번
-									</span>
-									<img src={idAsc ? upArrow : downArrow} alt="arrow" />
+								<th
+									onClick={() => {
+										setIdAsc(!idAsc);
+										handleAsc();
+									}}>
+									<span>학번</span>
+									<img src={idAsc ? downArrow : upArrow} alt="arrow" />
 								</th>
 								<th>사물함 번호</th>
-								<th>상태</th>
-								<th>학생회비 납부</th>
-								<th>관리자 여부</th>
+								<th>
+									<span>상태</span>
+								</th>
+								<th>
+									<span>학생회비 납부</span>
+								</th>
+								<th>
+									<span>관리자 여부</span>
+								</th>
 							</thead>
 							{/* 내용 */}
 							<tbody>

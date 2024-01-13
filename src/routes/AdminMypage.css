@@ -89,7 +89,15 @@
 	float: right;
 }
 
-#adminMypage .dataload span {
+#adminMypage input[type="file"] {
+	position: absolute;
+	width: 0;
+	height: 0;
+	padding: 0;
+	overflow: hidden;
+	border: 0;
+}
+#adminMypage .dataload label {
 	margin-left: 1rem;
 	color: var(--grayscale-600, #2b3674);
 
@@ -118,6 +126,9 @@
 	letter-spacing: -0.0175rem;
 }
 
+#adminMypage .infoTable th span {
+	margin-right: 0.5rem;
+}
 #adminMypage .infoTable td {
 	width: 10rem;
 	padding: 1rem;

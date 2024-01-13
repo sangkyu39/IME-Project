@@ -9,7 +9,7 @@ function Login() {
 	const [studentId, setStudentId] = useState("");
 	const [password, setPassword] = useState("");
 	const [isCorrect, setIsCorrect] = useState(true);
-	const loginURL = "http://54.180.70.111:8081/api/v2/auth/login";
+	const loginURL = "http://54.180.70.111:8083/api/v2/auth/login";
 	const onChange = (e) => {
 		const {
 			target: { name, value },
