@@ -112,7 +112,7 @@ const SiderBar = () => {
 
         <SectionStyled
           active={pathname.includes("/admin")}
-          onClick={onClickAdminBtn}
+          onClick={onClickStudentManagement}
           style={{
             color: getColorForSection("/admin", pathname),
             marginBottom: "1%",
@@ -140,7 +140,7 @@ const SiderBar = () => {
             <SectionStyled
               onClick={onClickLockerManagement}
               style={{
-                color: getColorForSection("/admin/locker-management", pathname),
+                color: getColorForSection("/locker-management", pathname),
                 marginLeft: "48%",
                 marginBottom: "1%",
               }}

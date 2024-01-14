@@ -23,14 +23,13 @@ function MyPage() {
       setUserId(parsedUserObj.userId);
       setRole(parsedUserObj.role);
       axios
-        .get(`http://54.180.70.111:8081/api/v2/users/${parsedUserObj.userId}`, {
+        .get(`http://54.180.70.111:8083/api/v2/users/${parsedUserObj.userId}`, {
           headers: {
             accessToken: parsedUserObj.accessToken,
           },
         })
         .then((response) => {
           console.log("Axios response:", response);
-
           const data = response.data;
           if (data.result.userName) {
             setUserName(data.result.userName);
