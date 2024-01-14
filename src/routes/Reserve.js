@@ -134,7 +134,9 @@ function Reserve() {
 												}}>
 												{info}
 											</p>
-											{/* <img src={alert} alt="alert" /> */}
+											<div className="alertIMG">
+												<img src={alert} alt="alert" />
+											</div>
 										</div>
 									);
 								})

@@ -64,18 +64,29 @@ function AdminMypage() {
 	}, []);
 	const [major, setMajor] = useState(localStorage.getItem("major"));
 	const [studentInfo, setStudentInfo] = useState();
-	const [idAsc, setIdAsc] = useState(true);
+	const [asc, setasc] = useState(true);
 	const [searchId, setSearchId] = useState("");
 
-	const handleAsc = () => {
-		const copyInfo = [...studentInfo].sort((a, b) => {
-			if (idAsc) {
-				return a.studentNum.localeCompare(b.studentNum);
-			} else {
-				return b.studentNum.localeCompare(a.studentNum);
-			}
-		});
-		setStudentInfo(copyInfo);
+	const handleAsc = (e) => {
+		if (e === "id") {
+			const copyInfo = [...studentInfo].sort((a, b) => {
+				if (asc) {
+					return a.studentNum.localeCompare(b.studentNum);
+				} else {
+					return b.studentNum.localeCompare(a.studentNum);
+				}
+			});
+			setStudentInfo(copyInfo);
+		} else if (e === "lockerNum") {
+			const copyInfo = [...studentInfo].sort((a, b) => {
+				if (asc && a.lockerNum) {
+					return a.lockerNum.localeCompare(b.lockerNum);
+				} else if (a.lockerNum) {
+					return b.lockerNum.localeCompare(a.lockerNum);
+				}
+			});
+			setStudentInfo(copyInfo);
+		}
 	};
 
 	const fileDownload = () => {
@@ -168,13 +179,20 @@ function AdminMypage() {
 								<th>이름</th>
 								<th
 									onClick={() => {
-										setIdAsc(!idAsc);
-										handleAsc();
+										setasc(!asc);
+										handleAsc("id");
 									}}>
 									<span>학번</span>
-									<img src={idAsc ? downArrow : upArrow} alt="arrow" />
+									<img src={asc ? downArrow : upArrow} alt="arrow" />
 								</th>
-								<th>사물함 번호</th>
+								<th
+									onClick={() => {
+										setasc(!asc);
+										handleAsc("lockerNum");
+									}}>
+									<span>사물함 번호</span>
+									<img src={asc ? downArrow : upArrow} alt="arrow" />
+								</th>
 								<th>
 									<span>상태</span>
 								</th>
