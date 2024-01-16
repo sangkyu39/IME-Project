@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import Sidebar from "../components/Sidebar";
 import styled from "styled-components";
@@ -25,6 +26,7 @@ function Reserve() {
 	const [showRow, setShowRow] = useState(1);
 	const [startTime, setStartTime] = useState(0);
 	const [endTime, setEndTime] = useState(0);
+	const [reservedLockerDetailId, setReservedLockerId] = useState();
 
 	async function getLockerInfo() {
 		await axios
@@ -46,8 +48,25 @@ function Reserve() {
 			});
 	}
 
+	async function getUserInfo() {
+		const URL = `http://54.180.70.111:8083/api/v2/users/${userObj.userId}`;
+		axios
+			.get(URL, {
+				headers: {
+					AccessToken: userObj.accessToken,
+				},
+			})
+			.then((res) => {
+				setReservedLockerId(res.data.result.reservedLockerDetailId);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	}
+
 	useEffect(() => {
 		getLockerInfo();
+		getUserInfo();
 	}, []);
 
 	// 보여지는 locker index 변경
@@ -73,7 +92,45 @@ function Reserve() {
 				setAlertReserveModal(true);
 			})
 			.catch((err) => {
+				// setPrevReserveModal(true);
+				setAlertReserveModal(true);
+				console.log(err);
+			});
+	}
+
+	async function changeReserve(e) {
+		const lockerDetailId = e;
+		const URL = reserveURL + lockerDetailId + "/reservations";
+		await axios
+			.post(URL, {
+				headers: {
+					AccessToken: userObj.accessToken,
+				},
+			})
+			.then((res) => {
+				console.log(res);
+				cancelReserve();
+			})
+			.catch((err) => {
 				setPrevReserveModal(true);
+				console.log(err);
+			});
+	}
+
+	async function cancelReserve() {
+		const cancelURL = reserveURL + reservedLockerDetailId + "/reservations";
+
+		await axios
+			.post(cancelURL, {
+				headers: {
+					AccessToken: userObj.accessToken,
+				},
+			})
+			.then((res) => {
+				console.log("취소 성공");
+				setChangeLockerModal(true);
+			})
+			.catch((err) => {
 				console.log(err);
 			});
 	}
