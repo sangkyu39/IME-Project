@@ -35,6 +35,7 @@ function MyPage() {
 						setUserName(data.result.userName);
 						setMajorDetail(data.result.majorDetail);
 						setStudentNum(data.result.studentNum);
+						localStorage.setItem("major", data.result.majorDetail);
 						setReservedLockerName(data.result.reservedLockerName);
 						setReservedLockerNum(data.result.reservedLockerNum);
 						setTime(data.time);
