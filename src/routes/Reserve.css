@@ -1,5 +1,6 @@
 #reservePage .reserveDiv {
 	width: 66.25rem;
+	height: 50rem;
 	flex-shrink: 0;
 	border-radius: 1.25rem;
 	background: var(--white, #fff);
@@ -66,9 +67,11 @@
 }
 
 #reservePage .lockerBoxDiv {
+	height: 40rem;
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	position: relative;
 }
 
 .modalTitle {

@@ -7,11 +7,11 @@ import Modal from "react-bootstrap/Modal";
 import "./Reserve.css";
 import alert from "../assets/alert-circle.svg";
 import axios from "axios";
+import { ContentPasteSearchOutlined, NoEncryption } from "@mui/icons-material";
 
 function Reserve() {
 	const userObj = JSON.parse(localStorage.getItem("userObj"));
 	const lockerURL = `http://54.180.70.111:8083/api/v2/users/${userObj.userId}/majors/lockers`;
-	const reserveURL = `http://54.180.70.111:8083/api/v2/users/${userObj.userId}/majors/${userObj.majorId}/lockerDetail/`;
 
 	const [major, setMajor] = useState(localStorage.getItem("major"));
 	const [lockerInfo, setLockerInfo] = useState();
@@ -25,8 +25,39 @@ function Reserve() {
 	const [showCol, setShowCol] = useState(1);
 	const [showRow, setShowRow] = useState(1);
 	const [startTime, setStartTime] = useState(0);
-	const [endTime, setEndTime] = useState(0);
+	const [endTime, setEndTime] = useState(2505474850088);
 	const [reservedLockerDetailId, setReservedLockerId] = useState();
+	const [reserveNum, setReserveNum] = useState(0);
+	const [reserveName, setReserveName] = useState("");
+	const [confirmChange, setConfirmChange] = useState();
+
+	// 현재 시간 측정
+	const [currentTime, setCurrentTime] = useState(new Date());
+	const [isBlocked, setIsBlocked] = useState(false);
+
+	// useEffect(() => {
+	// 	const timer = setInterval(() => {
+	// 		setCurrentTime(new Date());
+	// 		checkTime();
+	// 	}, 1000);
+	// 	return () => {
+	// 		clearInterval(timer);
+	// 	};
+	// }, []);
+
+	const checkTime = () => {
+		const currentHour = currentTime.getHours();
+		const currentMinute = currentTime.getMinutes();
+		// 정해진 시간 (예: 9시 0분부터 17시 30분까지) 설정
+		const start = new Date(startTime);
+		const end = new Date(endTime);
+		if (currentTime.getTime() >= start.getTime() && currentTime.getTime() < end.getTime()) {
+			setIsBlocked(false); // 예약 가능 시간인 경우
+		} else {
+			setIsBlocked(true); // 예약 가능 시간이 아닌 경우
+			console.log("예약 불가");
+		}
+	};
 
 	async function getLockerInfo() {
 		await axios
@@ -36,11 +67,11 @@ function Reserve() {
 				},
 			})
 			.then((res) => {
-				console.log(res.data.result.lockersInfo);
+				console.log(res.data);
 				setLockerInfo(res.data.result.lockersInfo);
 				setLockerName(res.data.result.lockersInfo.map((i) => i.locker.name));
+				setReserveName(res.data.result.lockersInfo[0].locker.name);
 				setStartTime(res.data.result.lockersInfo[0].locker.startReservationTime);
-				console.log(res.data.result.lockersInfo[0].locker.startReservationTime);
 				setEndTime(res.data.result.lockersInfo[0].locker.endReservationTime);
 			})
 			.catch((err) => {
@@ -57,6 +88,7 @@ function Reserve() {
 				},
 			})
 			.then((res) => {
+				console.log(res.data.result.reservedLockerDetailId);
 				setReservedLockerId(res.data.result.reservedLockerDetailId);
 			})
 			.catch((err) => {
@@ -67,68 +99,97 @@ function Reserve() {
 	useEffect(() => {
 		getLockerInfo();
 		getUserInfo();
+		connectSSE();
 	}, []);
+
+	// 서버 SSE 연결
+	const connectSSE = () => {
+		const url = `http://54.180.70.111:8083/api/v2/sse/connect/lockers`;
+
+		const eventSource = new EventSource(url, {
+			params: {
+				majorId: userObj.majorId,
+			},
+			headers: {
+				accessToken: userObj.accessToken,
+			},
+		});
+
+		eventSource.onopen = () => {
+			console.log("SSE 연결이 열렸습니다.");
+		};
+
+		eventSource.onmessage = (event) => {
+			console.log("SSE 메시지를 수신하였습니다:", event);
+			// 수신한 메시지 처리 로직 작성
+		};
+
+		eventSource.onerror = (error) => {
+			console.error(error);
+			// 오류 처리 로직 작성
+		};
+	};
 
 	// 보여지는 locker index 변경
 	function changeShowLocker(e) {
 		setShowLocker(e);
+		setReserveName(lockerName[e]);
 		setShowCol(lockerInfo[e].locker.totalColumn);
 		setShowRow(lockerInfo[e].locker.totalRow);
 		setStartTime(lockerInfo[e].locker.startResevationTime);
 		setEndTime(lockerInfo[e].locker.endResevationTime);
 	}
 
+	const reserveURL = `http://54.180.70.111:8083/api/v2/users/${userObj.userId}/majors/${userObj.majorId}/lockerDetail/`;
 	async function reserve(e) {
 		let lockerDetailId = e;
-		let URL = reserveURL + lockerDetailId + "/reservations";
-		console.log(URL);
-		await axios
-			.post(URL, {
-				headers: {
-					AccessToken: userObj.accessToken,
-				},
-			})
+		const URL = reserveURL + lockerDetailId + "/reservations";
+
+		fetch(URL, {
+			method: "POST",
+			headers: {
+				accessToken: userObj.accessToken,
+			},
+		})
 			.then((res) => {
-				setAlertReserveModal(true);
+				console.log("예약함");
+				console.log(res);
 			})
 			.catch((err) => {
-				// setPrevReserveModal(true);
-				setAlertReserveModal(true);
 				console.log(err);
+				console.log("실패");
+				setPrevReserveModal(true);
 			});
 	}
 
 	async function changeReserve(e) {
 		const lockerDetailId = e;
 		const URL = reserveURL + lockerDetailId + "/reservations";
-		await axios
-			.post(URL, {
-				headers: {
-					AccessToken: userObj.accessToken,
-				},
-			})
-			.then((res) => {
-				console.log(res);
-				cancelReserve();
-			})
-			.catch((err) => {
-				setPrevReserveModal(true);
-				console.log(err);
-			});
+		if (!reservedLockerDetailId) {
+			console.log("처음 예약");
+			reserve(e);
+			setAlertReserveModal(true);
+		} else {
+			console.log("변경");
+			await setChangeLockerModal(true);
+
+			cancelReserve(e);
+			reserve(e);
+
+			setConfirmChange(false);
+		}
 	}
 
-	async function cancelReserve() {
+	async function cancelReserve(e) {
 		const cancelURL = reserveURL + reservedLockerDetailId + "/reservations";
-
-		await axios
-			.post(cancelURL, {
-				headers: {
-					AccessToken: userObj.accessToken,
-				},
-			})
+		fetch(cancelURL, {
+			method: "PATCH",
+			headers: {
+				accessToken: userObj.accessToken,
+			},
+		})
 			.then((res) => {
-				console.log("취소 성공");
-				setChangeLockerModal(true);
+				console.log("del ");
 			})
 			.catch((err) => {
 				console.log(err);
@@ -200,77 +261,161 @@ function Reserve() {
 							) : (
 								<></>
 							)}
+							<div
+								style={{
+									display: "inline",
+									float: "right",
+								}}>
+								<p
+									style={{
+										position: "bottom",
+										color: "var(--grayscale-400, #7883A6)",
+										marginBottom: "0",
+										fontFamily: "Pretendard",
+										fontSize: "1rem",
+										fontWeight: "700",
+										lineHeight: "normal",
+										letterSpacing: "-0.02rem",
+									}}>
+									예약 가능 시간 : {startTime} ~ {endTime}
+								</p>
+							</div>
 						</div>
 						{/* 사물함 배치 및 예약  */}
-						<div className="lockerBoxDiv">
-							{lockerInfo ? (
-								colArr.map(function (info, col) {
-									return (
-										<div key={col}>
-											{rowArr.map(function (info, row) {
-												const locker = lockerInfo[showLocker].lockerDetail.find(
-													(item) =>
-														item.row_num === String(row + 1) && item.column_num === String(col + 1)
-												);
-												let num = locker ? locker.locker_num : 0;
-												return (
-													<div
-														className="lockerBox"
-														style={{
-															background:
-																locker && locker.status === "NON_RESERVED"
-																	? "var(--background, #f4f7fe)"
-																	: "var(--primary-400, #ED335D)",
-														}}
-														key={row}
-														onClick={() => {
-															reserve(locker.id);
-
-															// setChangeLockerModal(true);
-														}}>
-														<span
-															style={{
-																color:
-																	locker && locker.status === "NON_RESERVED"
-																		? "var(--grayscale-300, #a3aed0)"
-																		: "white",
-															}}
-															className="lockerBoxNum">
-															{num}
-														</span>
-													</div>
-												);
-											})}
+						<div>
+							<div className="lockerBoxDiv">
+								{lockerInfo ? (
+									colArr.map(function (info, col) {
+										return (
+											<div key={col}>
+												{rowArr.map(function (info, row) {
+													const locker = lockerInfo[showLocker].lockerDetail.find(
+														(item) =>
+															item.row_num === String(row + 1) &&
+															item.column_num === String(col + 1)
+													);
+													let num = locker ? locker.locker_num : 0;
+													return (
+														<div key={row}>
+															{locker ? (
+																<div
+																	className="lockerBox"
+																	style={{
+																		background:
+																			locker.status === "NON_RESERVED"
+																				? "var(--background, #f4f7fe)"
+																				: "var(--primary-400, #ED335D)",
+																	}}
+																	key={row}
+																	onClick={() => {
+																		setReserveNum(num);
+																		changeReserve(locker.id);
+																		// setChangeLockerModal(true);
+																	}}>
+																	<span
+																		style={{
+																			color:
+																				locker.status === "NON_RESERVED"
+																					? "var(--grayscale-300, #a3aed0)"
+																					: "white",
+																		}}
+																		className="lockerBoxNum">
+																		{num}
+																	</span>
+																</div>
+															) : (
+																<></>
+															)}
+														</div>
+													);
+												})}
+											</div>
+										);
+									})
+								) : (
+									<div
+										style={{
+											display: "flex",
+											height: "40rem",
+											/* title4 */
+											fontFamily: "Pretendard",
+											fontSize: "1.125rem",
+											fontWeight: "800",
+											lineHeight: "normal",
+											textAlign: "center",
+											alignItems: "center",
+											justifyContent: "center",
+										}}>
+										<p style={{ color: "var(--grayscale-600, #2b3674)" }}>
+											사물함 정보가 없습니다.
+										</p>
+									</div>
+								)}
+								{null && (
+									<div
+										className="overlay"
+										style={{
+											position: "absolute",
+											top: 0,
+											left: 0,
+											width: "100%",
+											height: "100%",
+											backdropFilter: "blur(0.5px)",
+											borderRadius: "0.75rem",
+											zIndex: 9999,
+											display: "flex",
+											alignItems: "center",
+											textAlign: "center",
+											justifyContent: "center",
+										}}>
+										<div>
+											<p
+												style={{
+													color: "var(--grayscale-600, #2B3674)",
+													textAlign: "center",
+													/* title4 */
+													fontFamily: "Pretendard",
+													fontSize: "1.125rem",
+													fontStyle: "normal",
+													fontWeight: "700",
+													lineHeight: "normal",
+												}}>
+												예약 가능 시간이 아닙니다. <br /> {startTime} ~ {endTime}
+											</p>
+											<button
+												style={{
+													display: "inline-block",
+													height: "3.75rem",
+													padding: "0.625rem 2.5rem",
+													justifyContent: "center",
+													gap: "0.625rem",
+													borderRadius: "1.25rem",
+													color: "white",
+													border: "none",
+													backgroundColor: "var(--primary-400, #ED335D)",
+													fontFamily: "Pretendard",
+													fontSize: "1rem",
+													fontStyle: "normal",
+													fontWeight: "700",
+													lineHeight: "normal",
+												}}>
+												다시 조회하기
+											</button>
 										</div>
-									);
-								})
-							) : (
-								<div
-									style={{
-										display: "flex",
-										height: "40rem",
-										/* title4 */
-										fontFamily: "Pretendard",
-										fontSize: "1.125rem",
-										fontWeight: "800",
-										lineHeight: "normal",
-										textAlign: "center",
-										alignItems: "center",
-										justifyContent: "center",
-									}}>
-									<p style={{ color: "var(--grayscale-600, #2b3674)" }}>사물함 정보가 없습니다.</p>
-								</div>
-							)}
+									</div>
+								)}
+							</div>
 						</div>
 						<ChangeLockerModal
 							setChangeLockerModal={setChangeLockerModal}
-							place={"센"}
-							num={1}
+							place={reserveName}
+							num={reserveNum}
+							setConfirmChange={setConfirmChange}
 							changeLockerModal={changeLockerModal}></ChangeLockerModal>
 						<AlertReserveModal
 							setAlertReserveModal={setAlertReserveModal}
-							place={"센"}
-							num={1}
+							place={reserveName}
+							num={reserveNum}
 							alertReserveModal={alertReserveModal}></AlertReserveModal>
 						<PrevReserveModal
 							setPrevReserveModal={setPrevReserveModal}
@@ -303,7 +448,14 @@ function ChangeLockerModal(props) {
 					<button className="modalWhiteBTN" onClick={handleClose}>
 						취소
 					</button>
-					<button className="modalRedBTN" style={{ width: "11.875rem" }}>
+					<button
+						className="modalRedBTN"
+						style={{ width: "11.875rem" }}
+						onClick={() => {
+							props.setConfirmChange(true);
+							console.log("확인 누름");
+							handleClose();
+						}}>
 						변경할게요
 					</button>
 				</div>
