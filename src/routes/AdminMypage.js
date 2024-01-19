@@ -1,3 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
+/* eslint-disable array-callback-return */
 import Sidebar from "../components/Sidebar";
 import styled from "styled-components";
 import React, { useState, useEffect } from "react";
@@ -12,18 +15,20 @@ import upArrow from "../assets/up_arrow.svg";
 import downArrow from "../assets/down_arrow.svg";
 import axios from "axios";
 import { getSuggestedQuery } from "@testing-library/react";
+import { faL } from "@fortawesome/free-solid-svg-icons";
 
 function AdminMypage() {
 	const userObj = JSON.parse(localStorage.getItem("userObj"));
 	const studentInfoURL = `http://54.180.70.111:8083/admin/api/v2/majors/${userObj.majorId}/users`;
 	const fileUploadURL = `http://54.180.70.111:8083/admin/api/v2/users/${userObj.userId}/file`;
-	const [pageNum, setPageNum] = useState(0);
+	const [page, setPage] = useState(0);
+
 	async function getStudentInfo() {
 		await axios
 			.get(studentInfoURL, {
 				params: {
 					majorId: userObj.majorId,
-					page: pageNum,
+					page: page,
 				},
 				headers: {
 					AccessToken: userObj.accessToken,
@@ -31,26 +36,90 @@ function AdminMypage() {
 			})
 			.then((res) => {
 				console.log(res);
-				setStudentInfo(res.data.result.adminResponse);
+				setStudentInfo((prevInfo) => [...prevInfo, ...res.data.result.adminResponse]);
+				setPage((prevPage) => prevPage + 1);
+				setLoading(false);
 			})
 			.catch((err) => {
 				console.log(err);
 			});
 	}
 
+	async function searchInfo(e) {
+		setLoading(true);
+		if (e) {
+			await axios
+				.get(studentInfoURL, {
+					params: {
+						majorId: userObj.majorId,
+						page: page,
+						search: e,
+					},
+					headers: {
+						AccessToken: userObj.accessToken,
+					},
+				})
+				.then((res) => {
+					console.log(res);
+					setStudentInfo(res.data.result.adminResponse);
+					setPage((prevPage) => prevPage + 1);
+					setLoading(false);
+				})
+				.catch((err) => {
+					console.log(err);
+				});
+		} else {
+			getStudentInfo();
+		}
+	}
+
+	useEffect(() => {
+		getStudentInfo();
+	}, []);
+
+	const [loading, setLoading] = useState(false);
+
+	useEffect(() => {
+		// 스크롤 이벤트 리스너 등록
+		const tbodyElement = document.getElementById("user-info-div");
+		tbodyElement.addEventListener("scroll", handleScroll);
+		return () => {
+			// 컴포넌트 언마운트 시 스크롤 이벤트 리스너 제거
+			tbodyElement.removeEventListener("scroll", handleScroll);
+		};
+	}, []);
+
+	const handleScroll = (event) => {
+		const tbodyElement = event.target;
+		// 스크롤 위치와 tbody 요소의 높이, 스크롤 가능한 높이 계산
+		const scrollTop = tbodyElement.scrollTop;
+		const tbodyHeight = tbodyElement.offsetHeight;
+		const scrollHeight = tbodyElement.scrollHeight;
+
+		// 스크롤이 tbody 하단에 위치하고 로딩 중이 아닐 때 추가 데이터 로드
+		if (scrollTop + tbodyHeight >= scrollHeight && !loading) {
+			if (searchId) {
+				console.log("검색 스크롤");
+				searchInfo();
+			} else {
+				console.log("전체 스크롤");
+				getStudentInfo();
+			}
+		}
+	};
+
 	const uploadFile = async (e) => {
 		const file = e.target.files[0];
+		const formData = new FormData();
+		formData.append("membershipFile", file);
 
-		const formData = {
-			membershipFile: file,
-		};
-		await axios
-			.post(fileUploadURL, {
-				headers: {
-					AccessToken: userObj.accessToken,
-				},
-				formData,
-			})
+		fetch(fileUploadURL, {
+			method: "POST",
+			headers: {
+				AccessToken: userObj.accessToken,
+			},
+			body: formData,
+		})
 			.then((res) => {
 				console.log(res);
 			})
@@ -59,13 +128,18 @@ function AdminMypage() {
 			});
 	};
 
-	useEffect(() => {
-		getStudentInfo();
-	}, []);
 	const [major, setMajor] = useState(localStorage.getItem("major"));
-	const [studentInfo, setStudentInfo] = useState();
+	const [studentInfo, setStudentInfo] = useState([]);
 	const [asc, setasc] = useState(true);
 	const [searchId, setSearchId] = useState("");
+
+	const onChange = (e) => {
+		setPage(0);
+		const {
+			target: { name, value },
+		} = e;
+		setSearchId(value);
+	};
 
 	const handleAsc = (e) => {
 		if (e === "id") {
@@ -89,13 +163,6 @@ function AdminMypage() {
 		}
 	};
 
-	const fileDownload = () => {
-		const fileURL = "sample.xlsx";
-		const link = document.createElement("a");
-		link.href = fileURL;
-		link.download = "sample.xlsx";
-		link.click();
-	};
 	return (
 		<MyPageStyled>
 			<Sidebar />
@@ -129,8 +196,11 @@ function AdminMypage() {
 									type="text"
 									placeholder="학생 검색"
 									value={searchId}
-									onChange={(e) => {
-										setSearchId(e.value);
+									onChange={onChange}
+									onKeyDown={(e) => {
+										if (e.key === "Enter") {
+											searchInfo(searchId);
+										}
 									}}
 								/>
 								<img className="search-icon" src={search} alt="돋보기 아이콘" />
@@ -168,9 +238,9 @@ function AdminMypage() {
 							</div>
 							<div className="dataload">
 								<img src={download} alt="download" />
-								<label for="dataload" onClick={fileDownload}>
+								<a href="https://sejong-bucket-s3.s3.ap-northeast-2.amazonaws.com/SEJONG_BUCKET/%ED%95%99%EC%83%9D%ED%9A%8C%EB[…]B%82%A9%EB%B6%80%EC%97%AC%EB%B6%80+TEST.xlsx">
 									양식 다운받기
-								</label>
+								</a>
 							</div>
 						</div>
 						<table className="infoTable">
@@ -204,7 +274,7 @@ function AdminMypage() {
 								</th>
 							</thead>
 							{/* 내용 */}
-							<tbody>
+							<tbody id="user-info-div">
 								{studentInfo ? (
 									studentInfo.map(function (info, i) {
 										return (
@@ -221,11 +291,13 @@ function AdminMypage() {
 													<input
 														type="checkbox"
 														id={`pay${i}`}
-														checked={info.userTier === "NON_MEMBER"}
+														checked={info.userTier === "MEMBER"}
 														onClick={() => {
 															let copyInfo = [...studentInfo];
-															copyInfo[i].userTier = !copyInfo[i].userTier;
+															copyInfo[i].userTier =
+																copyInfo[i].userTier === "MEMBER" ? "NON_MEMBER" : "MEMBER";
 															setStudentInfo(copyInfo);
+															console.log(copyInfo);
 														}}
 													/>
 													<label htmlFor={`pay${i}`}></label>
