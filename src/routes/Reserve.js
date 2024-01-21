@@ -35,15 +35,15 @@ function Reserve() {
 	const [currentTime, setCurrentTime] = useState(new Date());
 	const [isBlocked, setIsBlocked] = useState(false);
 
-	// useEffect(() => {
-	// 	const timer = setInterval(() => {
-	// 		setCurrentTime(new Date());
-	// 		checkTime();
-	// 	}, 1000);
-	// 	return () => {
-	// 		clearInterval(timer);
-	// 	};
-	// }, []);
+	useEffect(() => {
+		const timer = setInterval(() => {
+			setCurrentTime(new Date());
+			checkTime();
+		}, 1000);
+		return () => {
+			clearInterval(timer);
+		};
+	}, []);
 
 	const checkTime = () => {
 		const currentHour = currentTime.getHours();
@@ -53,6 +53,7 @@ function Reserve() {
 		const end = new Date(endTime);
 		if (currentTime.getTime() >= start.getTime() && currentTime.getTime() < end.getTime()) {
 			setIsBlocked(false); // 예약 가능 시간인 경우
+			// console.log("예약 가능");
 		} else {
 			setIsBlocked(true); // 예약 가능 시간이 아닌 경우
 			console.log("예약 불가");
@@ -69,7 +70,11 @@ function Reserve() {
 			.then((res) => {
 				console.log(res.data);
 				setLockerInfo(res.data.result.lockersInfo);
-				setLockerName(res.data.result.lockersInfo.map((i) => i.locker.name));
+				setLockerName(
+					res.data.result.lockersInfo.map((i) => {
+						return { name: i.locker.name, img: i.locker.image, isHovered: false };
+					})
+				);
 				setReserveName(res.data.result.lockersInfo[0].locker.name);
 				setStartTime(res.data.result.lockersInfo[0].locker.startReservationTime);
 				setEndTime(res.data.result.lockersInfo[0].locker.endReservationTime);
@@ -99,7 +104,7 @@ function Reserve() {
 	useEffect(() => {
 		getLockerInfo();
 		getUserInfo();
-		connectSSE();
+		// connectSSE();
 	}, []);
 
 	// 서버 SSE 연결
@@ -132,12 +137,13 @@ function Reserve() {
 
 	// 보여지는 locker index 변경
 	function changeShowLocker(e) {
+		console.log(lockerName);
 		setShowLocker(e);
 		setReserveName(lockerName[e]);
 		setShowCol(lockerInfo[e].locker.totalColumn);
 		setShowRow(lockerInfo[e].locker.totalRow);
-		setStartTime(lockerInfo[e].locker.startResevationTime);
-		setEndTime(lockerInfo[e].locker.endResevationTime);
+		setStartTime(lockerInfo[e].locker.startReservationTime);
+		setEndTime(lockerInfo[e].locker.endReservationTime);
 	}
 
 	const reserveURL = `http://54.180.70.111:8083/api/v2/users/${userObj.userId}/majors/${userObj.majorId}/lockerDetail/`;
@@ -201,6 +207,17 @@ function Reserve() {
 		setRowArr(Array.from({ length: showRow }, (_, index) => index));
 	}, [showRow, showCol]);
 
+	function formatDateTime(dateTimeString) {
+		const date = new Date(dateTimeString);
+		const year = date.getFullYear();
+		const month = String(date.getMonth() + 1).padStart(2, "0");
+		const day = String(date.getDate()).padStart(2, "0");
+		const hours = String(date.getHours()).padStart(2, "0");
+		const minutes = String(date.getMinutes()).padStart(2, "0");
+
+		return `${year}.${month}.${day} (${hours}:${minutes})`;
+	}
+
 	return (
 		<MyPageStyled>
 			<Sidebar />
@@ -213,6 +230,7 @@ function Reserve() {
 					<div className="reserveDiv">
 						{/* 학과 및 사물함 이름  */}
 						<div
+							className="classLockerNameDiv"
 							style={{
 								marginBottom: "3rem",
 							}}>
@@ -250,10 +268,37 @@ function Reserve() {
 												onClick={() => {
 													changeShowLocker(i);
 												}}>
-												{info}
+												{info.name}
 											</p>
-											<div className="alertIMG">
+											<div
+												className="alertIMG"
+												onMouseEnter={() => {
+													let copyName = [...lockerName];
+													copyName[i].isHovered = true;
+													setLockerName(copyName);
+													console.log(info.img);
+												}}
+												onMouseLeave={() => {
+													let copyName = [...lockerName];
+													copyName[i].isHovered = false;
+													setLockerName(copyName);
+												}}>
 												<img src={alert} alt="alert" />
+												{info.isHovered && (
+													<div>
+														<img
+															src={info.img}
+															alt="lockerImg"
+															style={{
+																position: "absolute",
+																top: "100%",
+																left: "50%",
+																transform: "translate(-50%, -50%)",
+																zIndex: 1,
+															}}
+														/>
+													</div>
+												)}
 											</div>
 										</div>
 									);
@@ -263,12 +308,14 @@ function Reserve() {
 							)}
 							<div
 								style={{
-									display: "inline",
 									float: "right",
+									display: "flex",
+									alignItems: "center",
+									height: "100%",
 								}}>
 								<p
 									style={{
-										position: "bottom",
+										marginTop: "5px",
 										color: "var(--grayscale-400, #7883A6)",
 										marginBottom: "0",
 										fontFamily: "Pretendard",
@@ -277,7 +324,7 @@ function Reserve() {
 										lineHeight: "normal",
 										letterSpacing: "-0.02rem",
 									}}>
-									예약 가능 시간 : {startTime} ~ {endTime}
+									예약 가능 시간 : {formatDateTime(startTime)} ~ {formatDateTime(endTime)}
 								</p>
 							</div>
 						</div>
@@ -351,7 +398,7 @@ function Reserve() {
 										</p>
 									</div>
 								)}
-								{null && (
+								{!isBlocked && (
 									<div
 										className="overlay"
 										style={{
@@ -380,7 +427,8 @@ function Reserve() {
 													fontWeight: "700",
 													lineHeight: "normal",
 												}}>
-												예약 가능 시간이 아닙니다. <br /> {startTime} ~ {endTime}
+												예약 가능 시간이 아닙니다. <br /> {formatDateTime(startTime)} ~{" "}
+												{formatDateTime(endTime)}
 											</p>
 											<button
 												style={{
