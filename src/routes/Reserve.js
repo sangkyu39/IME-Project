@@ -139,13 +139,14 @@ function Reserve() {
 	function changeShowLocker(e) {
 		console.log(lockerName);
 		setShowLocker(e);
-		setReserveName(lockerName[e]);
+		setReserveName(lockerName[e].name);
 		setShowCol(lockerInfo[e].locker.totalColumn);
 		setShowRow(lockerInfo[e].locker.totalRow);
 		setStartTime(lockerInfo[e].locker.startReservationTime);
 		setEndTime(lockerInfo[e].locker.endReservationTime);
 	}
 
+	// 사물함 예약 함수
 	const reserveURL = `http://54.180.70.111:8083/api/v2/users/${userObj.userId}/majors/${userObj.majorId}/lockerDetail/`;
 	async function reserve(e) {
 		let lockerDetailId = e;
@@ -160,6 +161,16 @@ function Reserve() {
 			.then((res) => {
 				console.log("예약함");
 				console.log(res);
+				setReservedLockerId(e);
+				let copyInfo = [...lockerInfo];
+				copyInfo.forEach((i) => {
+					i.lockerDetail.forEach((detail) => {
+						if (detail.id === e) {
+							detail.status = "RESERVED";
+						}
+					});
+				});
+				setLockerInfo(copyInfo);
 			})
 			.catch((err) => {
 				console.log(err);
@@ -167,7 +178,7 @@ function Reserve() {
 				setPrevReserveModal(true);
 			});
 	}
-
+	// 버튼 눌렀을 시 예약 함수
 	async function changeReserve(e) {
 		const lockerDetailId = e;
 		const URL = reserveURL + lockerDetailId + "/reservations";
@@ -180,12 +191,13 @@ function Reserve() {
 			await setChangeLockerModal(true);
 
 			cancelReserve(e);
-			reserve(e);
+			// reserve(e);
 
 			setConfirmChange(false);
 		}
 	}
 
+	// 예약 취소 함수
 	async function cancelReserve(e) {
 		const cancelURL = reserveURL + reservedLockerDetailId + "/reservations";
 		fetch(cancelURL, {
@@ -195,7 +207,15 @@ function Reserve() {
 			},
 		})
 			.then((res) => {
-				console.log("del ");
+				let copyInfo = [...lockerInfo];
+				copyInfo.forEach((i) => {
+					i.lockerDetail.forEach((detail) => {
+						if (detail.id === e) {
+							detail.status = "NON_RESERVED";
+						}
+					});
+				});
+				setLockerInfo(copyInfo);
 			})
 			.catch((err) => {
 				console.log(err);
@@ -398,7 +418,7 @@ function Reserve() {
 										</p>
 									</div>
 								)}
-								{!isBlocked && (
+								{isBlocked && (
 									<div
 										className="overlay"
 										style={{
