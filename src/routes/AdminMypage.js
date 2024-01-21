@@ -209,14 +209,17 @@ function AdminMypage() {
 								{studentInfo ? (
 									<>
 										<img src={downloadCoud} alt="downloadCloud" />
-										<label for="download">데이터 내보내기</label>
+										<label className="dataBTN" htmlFor="download">
+											데이터 내보내기
+										</label>
 										<input id="download" type="file" name="file " accept=".xlsx .csv"></input>
 									</>
 								) : (
 									<>
 										<img src={downloadCloudGray} alt="uploadCloudGray" />
 										<label
-											for="uploadG"
+											className="dataBTN"
+											htmlFor="uploadG"
 											style={{
 												color: "var(--grayscale-300, #A3AED0)",
 											}}>
@@ -227,7 +230,9 @@ function AdminMypage() {
 							</div>
 							<div className="dataload">
 								<img src={uploadCloud} alt="uploadCloud" />
-								<label for="upload">데이터 가져오기</label>
+								<label className="dataBTN" htmlFor="upload">
+									데이터 가져오기
+								</label>
 								<input
 									onChange={(e) => {
 										uploadFile(e);
@@ -238,7 +243,9 @@ function AdminMypage() {
 							</div>
 							<div className="dataload">
 								<img src={download} alt="download" />
-								<a href="https://sejong-bucket-s3.s3.ap-northeast-2.amazonaws.com/SEJONG_BUCKET/%ED%95%99%EC%83%9D%ED%9A%8C%EB[…]B%82%A9%EB%B6%80%EC%97%AC%EB%B6%80+TEST.xlsx">
+								<a
+									className="dataBTN"
+									href="https://sejong-bucket-s3.s3.ap-northeast-2.amazonaws.com/SEJONG_BUCKET/%ED%95%99%EC%83%9D%ED%9A%8C%EB[…]B%82%A9%EB%B6%80%EC%97%AC%EB%B6%80+TEST.xlsx">
 									양식 다운받기
 								</a>
 							</div>
@@ -246,32 +253,34 @@ function AdminMypage() {
 						<table className="infoTable">
 							{/* 목록 */}
 							<thead>
-								<th>이름</th>
-								<th
-									onClick={() => {
-										setasc(!asc);
-										handleAsc("id");
-									}}>
-									<span>학번</span>
-									<img src={asc ? downArrow : upArrow} alt="arrow" />
-								</th>
-								<th
-									onClick={() => {
-										setasc(!asc);
-										handleAsc("lockerNum");
-									}}>
-									<span>사물함 번호</span>
-									<img src={asc ? downArrow : upArrow} alt="arrow" />
-								</th>
-								<th>
-									<span>상태</span>
-								</th>
-								<th>
-									<span>학생회비 납부</span>
-								</th>
-								<th>
-									<span>관리자 여부</span>
-								</th>
+								<tr>
+									<th>이름</th>
+									<th
+										onClick={() => {
+											setasc(!asc);
+											handleAsc("id");
+										}}>
+										<span>학번</span>
+										<img src={asc ? downArrow : upArrow} alt="arrow" />
+									</th>
+									<th
+										onClick={() => {
+											setasc(!asc);
+											handleAsc("lockerNum");
+										}}>
+										<span>사물함 번호</span>
+										<img src={asc ? downArrow : upArrow} alt="arrow" />
+									</th>
+									<th>
+										<span>상태</span>
+									</th>
+									<th>
+										<span>학생회비 납부</span>
+									</th>
+									<th>
+										<span>관리자 여부</span>
+									</th>
+								</tr>
 							</thead>
 							{/* 내용 */}
 							<tbody id="user-info-div">
@@ -291,7 +300,7 @@ function AdminMypage() {
 													<input
 														type="checkbox"
 														id={`pay${i}`}
-														checked={info.userTier === "MEMBER"}
+														defaultChecked={info.userTier === "MEMBER"}
 														onClick={() => {
 															let copyInfo = [...studentInfo];
 															copyInfo[i].userTier =
@@ -306,7 +315,7 @@ function AdminMypage() {
 													<input
 														type="checkbox"
 														id={`admin${i}`}
-														checked={info.role === "ROLE_ADMIN" ? true : false}
+														defaultChecked={info.role === "ROLE_ADMIN" ? true : false}
 														onClick={() => {
 															let copyInfo = [...studentInfo];
 															copyInfo[i].role = !copyInfo[i].role;

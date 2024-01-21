@@ -97,10 +97,11 @@
 	overflow: hidden;
 	border: 0;
 }
-#adminMypage .dataload label {
+#adminMypage .dataload .dataBTN {
 	margin-left: 1rem;
 	color: var(--grayscale-600, #2b3674);
 
+	text-decoration-line: none;
 	/* body1 */
 	font-family: Pretendard;
 	font-size: 1rem;
