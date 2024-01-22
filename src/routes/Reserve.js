@@ -8,6 +8,7 @@ import "./Reserve.css";
 import alert from "../assets/alert-circle.svg";
 import axios from "axios";
 import { ContentPasteSearchOutlined, NoEncryption } from "@mui/icons-material";
+import refreshToken from "../components/refreshToken.js";
 
 function Reserve() {
 	const userObj = JSON.parse(localStorage.getItem("userObj"));
@@ -26,10 +27,10 @@ function Reserve() {
 	const [showRow, setShowRow] = useState(1);
 	const [startTime, setStartTime] = useState(0);
 	const [endTime, setEndTime] = useState(2505474850088);
-	const [reservedLockerDetailId, setReservedLockerId] = useState();
+	const [reservedLockerId, setReservedLockerId] = useState();
 	const [reserveNum, setReserveNum] = useState(0);
 	const [reserveName, setReserveName] = useState("");
-	const [confirmChange, setConfirmChange] = useState();
+	const [reserveId, setReserveId] = useState(0);
 
 	// 현재 시간 측정
 	const [currentTime, setCurrentTime] = useState(new Date());
@@ -53,10 +54,8 @@ function Reserve() {
 		const end = new Date(endTime);
 		if (currentTime.getTime() >= start.getTime() && currentTime.getTime() < end.getTime()) {
 			setIsBlocked(false); // 예약 가능 시간인 경우
-			// console.log("예약 가능");
 		} else {
 			setIsBlocked(true); // 예약 가능 시간이 아닌 경우
-			console.log("예약 불가");
 		}
 	};
 
@@ -81,6 +80,7 @@ function Reserve() {
 			})
 			.catch((err) => {
 				console.log(err);
+				refreshToken();
 			});
 	}
 
@@ -118,6 +118,7 @@ function Reserve() {
 			headers: {
 				accessToken: userObj.accessToken,
 			},
+			withCredentials: true,
 		});
 
 		eventSource.onopen = () => {
@@ -137,7 +138,6 @@ function Reserve() {
 
 	// 보여지는 locker index 변경
 	function changeShowLocker(e) {
-		console.log(lockerName);
 		setShowLocker(e);
 		setReserveName(lockerName[e].name);
 		setShowCol(lockerInfo[e].locker.totalColumn);
@@ -146,8 +146,18 @@ function Reserve() {
 		setEndTime(lockerInfo[e].locker.endReservationTime);
 	}
 
-	// 사물함 예약 함수
 	const reserveURL = `http://54.180.70.111:8083/api/v2/users/${userObj.userId}/majors/${userObj.majorId}/lockerDetail/`;
+
+	function selectLocker(e) {
+		if (!reservedLockerId) {
+			console.log("first");
+			reserve(e);
+		} else {
+			console.log("change");
+			setChangeLockerModal(true);
+		}
+	}
+	// 사물함 예약 함수
 	async function reserve(e) {
 		let lockerDetailId = e;
 		const URL = reserveURL + lockerDetailId + "/reservations";
@@ -159,8 +169,6 @@ function Reserve() {
 			},
 		})
 			.then((res) => {
-				console.log("예약함");
-				console.log(res);
 				setReservedLockerId(e);
 				let copyInfo = [...lockerInfo];
 				copyInfo.forEach((i) => {
@@ -171,35 +179,22 @@ function Reserve() {
 					});
 				});
 				setLockerInfo(copyInfo);
+				setAlertReserveModal(true);
 			})
 			.catch((err) => {
 				console.log(err);
-				console.log("실패");
 				setPrevReserveModal(true);
 			});
 	}
-	// 버튼 눌렀을 시 예약 함수
+	// 사물함 변경 시 함수
 	async function changeReserve(e) {
 		const lockerDetailId = e;
-		const URL = reserveURL + lockerDetailId + "/reservations";
-		if (!reservedLockerDetailId) {
-			console.log("처음 예약");
-			reserve(e);
-			setAlertReserveModal(true);
-		} else {
-			console.log("변경");
-			await setChangeLockerModal(true);
-
-			cancelReserve(e);
-			// reserve(e);
-
-			setConfirmChange(false);
-		}
+		cancelReserve(reservedLockerId, lockerDetailId);
 	}
 
 	// 예약 취소 함수
-	async function cancelReserve(e) {
-		const cancelURL = reserveURL + reservedLockerDetailId + "/reservations";
+	async function cancelReserve(e, id) {
+		const cancelURL = reserveURL + reservedLockerId + "/reservations";
 		fetch(cancelURL, {
 			method: "PATCH",
 			headers: {
@@ -207,6 +202,7 @@ function Reserve() {
 			},
 		})
 			.then((res) => {
+				setReservedLockerId(null);
 				let copyInfo = [...lockerInfo];
 				copyInfo.forEach((i) => {
 					i.lockerDetail.forEach((detail) => {
@@ -216,6 +212,7 @@ function Reserve() {
 					});
 				});
 				setLockerInfo(copyInfo);
+				reserve(id);
 			})
 			.catch((err) => {
 				console.log(err);
@@ -264,9 +261,6 @@ function Reserve() {
 									letterSpacing: "-0.03rem",
 									display: "inline",
 									marginLeft: "1.5rem",
-								}}
-								onClick={() => {
-									console.log(lockerName);
 								}}>
 								{major}
 							</p>
@@ -296,7 +290,6 @@ function Reserve() {
 													let copyName = [...lockerName];
 													copyName[i].isHovered = true;
 													setLockerName(copyName);
-													console.log(info.img);
 												}}
 												onMouseLeave={() => {
 													let copyName = [...lockerName];
@@ -311,10 +304,11 @@ function Reserve() {
 															alt="lockerImg"
 															style={{
 																position: "absolute",
-																top: "100%",
+																top: "50%",
 																left: "50%",
-																transform: "translate(-50%, -50%)",
+																transform: "translate(-50%, 10%)",
 																zIndex: 1,
+																borderRadius: "1.25rem",
 															}}
 														/>
 													</div>
@@ -376,7 +370,9 @@ function Reserve() {
 																	key={row}
 																	onClick={() => {
 																		setReserveNum(num);
-																		changeReserve(locker.id);
+																		setReserveId(locker.id);
+																		selectLocker(locker.id);
+																		// changeReserve(locker.id);
 																		// setChangeLockerModal(true);
 																	}}>
 																	<span
@@ -478,7 +474,8 @@ function Reserve() {
 							setChangeLockerModal={setChangeLockerModal}
 							place={reserveName}
 							num={reserveNum}
-							setConfirmChange={setConfirmChange}
+							id={reserveId}
+							changeReserve={changeReserve}
 							changeLockerModal={changeLockerModal}></ChangeLockerModal>
 						<AlertReserveModal
 							setAlertReserveModal={setAlertReserveModal}
@@ -520,8 +517,7 @@ function ChangeLockerModal(props) {
 						className="modalRedBTN"
 						style={{ width: "11.875rem" }}
 						onClick={() => {
-							props.setConfirmChange(true);
-							console.log("확인 누름");
+							props.changeReserve(props.id);
 							handleClose();
 						}}>
 						변경할게요
