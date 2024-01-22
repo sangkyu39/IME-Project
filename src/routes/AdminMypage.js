@@ -5,6 +5,7 @@ import Sidebar from "../components/Sidebar";
 import styled from "styled-components";
 import React, { useState, useEffect } from "react";
 import "./AdminMypage.css";
+import SAMPLEFILE from "../assets/sample.xlsx";
 
 import search from "../assets/search.svg";
 import downloadCoud from "../assets/download-cloud.svg";
@@ -243,9 +244,7 @@ function AdminMypage() {
 							</div>
 							<div className="dataload">
 								<img src={download} alt="download" />
-								<a
-									className="dataBTN"
-									href="https://sejong-bucket-s3.s3.ap-northeast-2.amazonaws.com/SEJONG_BUCKET/%ED%95%99%EC%83%9D%ED%9A%8C%EB[…]B%82%A9%EB%B6%80%EC%97%AC%EB%B6%80+TEST.xlsx">
+								<a className="dataBTN" href={SAMPLEFILE} download="sample">
 									양식 다운받기
 								</a>
 							</div>
