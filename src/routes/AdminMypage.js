@@ -23,6 +23,10 @@ function AdminMypage() {
 	const studentInfoURL = `http://54.180.70.111:8083/admin/api/v2/majors/${userObj.majorId}/users`;
 	const fileUploadURL = `http://54.180.70.111:8083/admin/api/v2/users/${userObj.userId}/file`;
 	const [page, setPage] = useState(0);
+	const [major, setMajor] = useState(localStorage.getItem("major"));
+	const [studentInfo, setStudentInfo] = useState([]);
+	const [asc, setasc] = useState(true);
+	const [searchId, setSearchId] = useState("");
 
 	async function getStudentInfo() {
 		await axios
@@ -70,6 +74,7 @@ function AdminMypage() {
 					console.log(err);
 				});
 		} else {
+			setStudentInfo([]);
 			getStudentInfo();
 		}
 	}
@@ -128,11 +133,6 @@ function AdminMypage() {
 				console.log(err);
 			});
 	};
-
-	const [major, setMajor] = useState(localStorage.getItem("major"));
-	const [studentInfo, setStudentInfo] = useState([]);
-	const [asc, setasc] = useState(true);
-	const [searchId, setSearchId] = useState("");
 
 	const onChange = (e) => {
 		setPage(0);
@@ -291,19 +291,21 @@ function AdminMypage() {
 													borderBottom: "1px solid var(--background, #F4F7FE)",
 												}}
 												key={i}>
-												<td>{info.studentName}</td>
-												<td>{info.studentNum}</td>
-												<td>{info.lockerNum}</td>
-												<td>{info.status}</td>
+												<td>{info.userInfo.studentName}</td>
+												<td>{info.userInfo.studentNum}</td>
+												<td>{info.reservationInfo.lockerNum}</td>
+												<td>{info.userInfo.status}</td>
 												<td>
 													<input
 														type="checkbox"
 														id={`pay${i}`}
-														defaultChecked={info.userTier === "MEMBER"}
+														defaultChecked={info.userInfo.userTier === "MEMBER"}
 														onClick={() => {
 															let copyInfo = [...studentInfo];
-															copyInfo[i].userTier =
-																copyInfo[i].userTier === "MEMBER" ? "NON_MEMBER" : "MEMBER";
+															copyInfo[i].userInfo.userTier =
+																copyInfo[i].userInfo.userTier === "MEMBER"
+																	? "NON_MEMBER"
+																	: "MEMBER";
 															setStudentInfo(copyInfo);
 															console.log(copyInfo);
 														}}
@@ -314,10 +316,13 @@ function AdminMypage() {
 													<input
 														type="checkbox"
 														id={`admin${i}`}
-														defaultChecked={info.role === "ROLE_ADMIN" ? true : false}
+														defaultChecked={info.userInfo.role === "ROLE_ADMIN" ? true : false}
 														onClick={() => {
 															let copyInfo = [...studentInfo];
-															copyInfo[i].role = !copyInfo[i].role;
+															copyInfo[i].userInfo.role =
+																copyInfo[i].userInfo.role === "ROLE_ADMIN"
+																	? "ROLE_USER"
+																	: "ROLE_ADMIN";
 															setStudentInfo(copyInfo);
 														}}
 													/>
