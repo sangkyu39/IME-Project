@@ -9,6 +9,7 @@ import alert from "../assets/alert-circle.svg";
 import axios from "axios";
 import { ContentPasteSearchOutlined, NoEncryption } from "@mui/icons-material";
 import refreshToken from "../components/refreshToken.js";
+import { EventSourcePolyfill, NativeEventSource } from "event-source-polyfill";
 
 function Reserve() {
 	const userObj = JSON.parse(localStorage.getItem("userObj"));
@@ -77,6 +78,8 @@ function Reserve() {
 				setReserveName(res.data.result.lockersInfo[0].locker.name);
 				setStartTime(res.data.result.lockersInfo[0].locker.startReservationTime);
 				setEndTime(res.data.result.lockersInfo[0].locker.endReservationTime);
+				setShowCol(res.data.result.lockersInfo[0].locker.totalColumn);
+				setShowRow(res.data.result.lockersInfo[0].locker.totalRow);
 			})
 			.catch((err) => {
 				console.log(err);
@@ -104,35 +107,32 @@ function Reserve() {
 	useEffect(() => {
 		getLockerInfo();
 		getUserInfo();
-		// connectSSE();
+		connectSSE();
+		// refreshToken();
 	}, []);
 
 	// 서버 SSE 연결
 	const connectSSE = () => {
-		const url = `http://54.180.70.111:8083/api/v2/sse/connect/lockers`;
+		const url =
+			"http://54.180.70.111:8083/api/v2/sse/connect/lockers?majorId=" + encodeURI(userObj.majorId);
 
-		const eventSource = new EventSource(url, {
-			params: {
-				majorId: userObj.majorId,
-			},
+		const eventSource = new EventSourcePolyfill(url, {
 			headers: {
 				accessToken: userObj.accessToken,
 			},
-			withCredentials: true,
 		});
 
-		eventSource.onopen = () => {
+		eventSource.onopen = (event) => {
 			console.log("SSE 연결이 열렸습니다.");
+			console.log(event);
 		};
 
 		eventSource.onmessage = (event) => {
 			console.log("SSE 메시지를 수신하였습니다:", event);
-			// 수신한 메시지 처리 로직 작성
 		};
 
 		eventSource.onerror = (error) => {
 			console.error(error);
-			// 오류 처리 로직 작성
 		};
 	};
 
@@ -169,6 +169,7 @@ function Reserve() {
 			},
 		})
 			.then((res) => {
+				console.log(res);
 				setReservedLockerId(e);
 				let copyInfo = [...lockerInfo];
 				copyInfo.forEach((i) => {
