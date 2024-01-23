@@ -5,6 +5,7 @@ import Sidebar from "../components/Sidebar";
 import styled from "styled-components";
 import React, { useState, useEffect } from "react";
 import "./AdminMypage.css";
+import SAMPLEFILE from "../assets/sample.xlsx";
 
 import search from "../assets/search.svg";
 import downloadCoud from "../assets/download-cloud.svg";
@@ -22,6 +23,10 @@ function AdminMypage() {
 	const studentInfoURL = `http://54.180.70.111:8083/admin/api/v2/majors/${userObj.majorId}/users`;
 	const fileUploadURL = `http://54.180.70.111:8083/admin/api/v2/users/${userObj.userId}/file`;
 	const [page, setPage] = useState(0);
+	const [major, setMajor] = useState(localStorage.getItem("major"));
+	const [studentInfo, setStudentInfo] = useState([]);
+	const [asc, setasc] = useState(true);
+	const [searchId, setSearchId] = useState("");
 
 	async function getStudentInfo() {
 		await axios
@@ -69,6 +74,7 @@ function AdminMypage() {
 					console.log(err);
 				});
 		} else {
+			setStudentInfo([]);
 			getStudentInfo();
 		}
 	}
@@ -127,11 +133,6 @@ function AdminMypage() {
 				console.log(err);
 			});
 	};
-
-	const [major, setMajor] = useState(localStorage.getItem("major"));
-	const [studentInfo, setStudentInfo] = useState([]);
-	const [asc, setasc] = useState(true);
-	const [searchId, setSearchId] = useState("");
 
 	const onChange = (e) => {
 		setPage(0);
@@ -209,14 +210,17 @@ function AdminMypage() {
 								{studentInfo ? (
 									<>
 										<img src={downloadCoud} alt="downloadCloud" />
-										<label for="download">데이터 내보내기</label>
+										<label className="dataBTN" htmlFor="download">
+											데이터 내보내기
+										</label>
 										<input id="download" type="file" name="file " accept=".xlsx .csv"></input>
 									</>
 								) : (
 									<>
 										<img src={downloadCloudGray} alt="uploadCloudGray" />
 										<label
-											for="uploadG"
+											className="dataBTN"
+											htmlFor="uploadG"
 											style={{
 												color: "var(--grayscale-300, #A3AED0)",
 											}}>
@@ -227,7 +231,9 @@ function AdminMypage() {
 							</div>
 							<div className="dataload">
 								<img src={uploadCloud} alt="uploadCloud" />
-								<label for="upload">데이터 가져오기</label>
+								<label className="dataBTN" htmlFor="upload">
+									데이터 가져오기
+								</label>
 								<input
 									onChange={(e) => {
 										uploadFile(e);
@@ -238,7 +244,7 @@ function AdminMypage() {
 							</div>
 							<div className="dataload">
 								<img src={download} alt="download" />
-								<a href="https://sejong-bucket-s3.s3.ap-northeast-2.amazonaws.com/SEJONG_BUCKET/%ED%95%99%EC%83%9D%ED%9A%8C%EB[…]B%82%A9%EB%B6%80%EC%97%AC%EB%B6%80+TEST.xlsx">
+								<a className="dataBTN" href={SAMPLEFILE} download="sample">
 									양식 다운받기
 								</a>
 							</div>
@@ -246,32 +252,34 @@ function AdminMypage() {
 						<table className="infoTable">
 							{/* 목록 */}
 							<thead>
-								<th>이름</th>
-								<th
-									onClick={() => {
-										setasc(!asc);
-										handleAsc("id");
-									}}>
-									<span>학번</span>
-									<img src={asc ? downArrow : upArrow} alt="arrow" />
-								</th>
-								<th
-									onClick={() => {
-										setasc(!asc);
-										handleAsc("lockerNum");
-									}}>
-									<span>사물함 번호</span>
-									<img src={asc ? downArrow : upArrow} alt="arrow" />
-								</th>
-								<th>
-									<span>상태</span>
-								</th>
-								<th>
-									<span>학생회비 납부</span>
-								</th>
-								<th>
-									<span>관리자 여부</span>
-								</th>
+								<tr>
+									<th>이름</th>
+									<th
+										onClick={() => {
+											setasc(!asc);
+											handleAsc("id");
+										}}>
+										<span>학번</span>
+										<img src={asc ? downArrow : upArrow} alt="arrow" />
+									</th>
+									<th
+										onClick={() => {
+											setasc(!asc);
+											handleAsc("lockerNum");
+										}}>
+										<span>사물함 번호</span>
+										<img src={asc ? downArrow : upArrow} alt="arrow" />
+									</th>
+									<th>
+										<span>상태</span>
+									</th>
+									<th>
+										<span>학생회비 납부</span>
+									</th>
+									<th>
+										<span>관리자 여부</span>
+									</th>
+								</tr>
 							</thead>
 							{/* 내용 */}
 							<tbody id="user-info-div">
@@ -283,19 +291,21 @@ function AdminMypage() {
 													borderBottom: "1px solid var(--background, #F4F7FE)",
 												}}
 												key={i}>
-												<td>{info.studentName}</td>
-												<td>{info.studentNum}</td>
-												<td>{info.lockerNum}</td>
-												<td>{info.status}</td>
+												<td>{info.userInfo.studentName}</td>
+												<td>{info.userInfo.studentNum}</td>
+												<td>{info.reservationInfo.lockerNum}</td>
+												<td>{info.userInfo.status}</td>
 												<td>
 													<input
 														type="checkbox"
 														id={`pay${i}`}
-														checked={info.userTier === "MEMBER"}
+														defaultChecked={info.userInfo.userTier === "MEMBER"}
 														onClick={() => {
 															let copyInfo = [...studentInfo];
-															copyInfo[i].userTier =
-																copyInfo[i].userTier === "MEMBER" ? "NON_MEMBER" : "MEMBER";
+															copyInfo[i].userInfo.userTier =
+																copyInfo[i].userInfo.userTier === "MEMBER"
+																	? "NON_MEMBER"
+																	: "MEMBER";
 															setStudentInfo(copyInfo);
 															console.log(copyInfo);
 														}}
@@ -306,10 +316,13 @@ function AdminMypage() {
 													<input
 														type="checkbox"
 														id={`admin${i}`}
-														checked={info.role === "ROLE_ADMIN" ? true : false}
+														defaultChecked={info.userInfo.role === "ROLE_ADMIN" ? true : false}
 														onClick={() => {
 															let copyInfo = [...studentInfo];
-															copyInfo[i].role = !copyInfo[i].role;
+															copyInfo[i].userInfo.role =
+																copyInfo[i].userInfo.role === "ROLE_ADMIN"
+																	? "ROLE_USER"
+																	: "ROLE_ADMIN";
 															setStudentInfo(copyInfo);
 														}}
 													/>
