@@ -164,6 +164,37 @@ function AdminMypage() {
 		}
 	};
 
+	const updateInfo = (e) => {
+		const updateURL = "http://54.180.70.111:8083/admin/api/v2/users";
+		let updateStudentInfo = Object.values(studentInfo).map((item) => ({
+			admin: item.userInfo.role === "ROLE_ADMIN",
+			lockerDetailId: 0,
+			membership: item.userInfo.userTier !== "NON_MEMBER",
+			studentNum: item.userInfo.studentNum,
+		}));
+		updateStudentInfo = {
+			modifiedUserInfoList: updateStudentInfo,
+		};
+		console.log(updateStudentInfo);
+		let formData = new FormData();
+		formData.append("data", JSON.stringify(updateStudentInfo));
+		fetch(updateURL, {
+			method: "PATCH",
+			headers: {
+				accessToken: userObj.accessToken,
+			},
+			data: {
+				updateStudentInfo,
+			},
+		})
+			.then((res) => {
+				console.log(res);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	};
+
 	return (
 		<MyPageStyled>
 			<Sidebar />
@@ -186,7 +217,9 @@ function AdminMypage() {
 							}}>
 							{major} 학생 관리
 						</p>
-						<button className="saveBTN">저장하기</button>
+						<button className="saveBTN" onClick={updateInfo}>
+							저장하기
+						</button>
 						<div
 							style={{
 								marginTop: "3rem",
@@ -307,7 +340,6 @@ function AdminMypage() {
 																	? "NON_MEMBER"
 																	: "MEMBER";
 															setStudentInfo(copyInfo);
-															console.log(copyInfo);
 														}}
 													/>
 													<label htmlFor={`pay${i}`}></label>
