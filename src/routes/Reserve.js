@@ -21,6 +21,7 @@ function Reserve() {
 	const [changeLockerModal, setChangeLockerModal] = useState(false);
 	const [alertReserveModal, setAlertReserveModal] = useState(false);
 	const [prevReserveModal, setPrevReserveModal] = useState(false);
+	const [nonetargetModal, setNonetargetModal] = useState(false);
 	const [colArr, setColArr] = useState();
 	const [rowArr, setRowArr] = useState();
 	const [showLocker, setShowLocker] = useState(0);
@@ -68,7 +69,7 @@ function Reserve() {
 				},
 			})
 			.then((res) => {
-				// console.log(res.data);
+				console.log(res.data);
 				setLockerInfo(res.data.result.lockersInfo);
 				setLockerName(
 					res.data.result.lockersInfo.map((i) => {
@@ -96,7 +97,7 @@ function Reserve() {
 				},
 			})
 			.then((res) => {
-				// console.log(res.data.result.reservedLockerDetailId);
+				console.log(res.data.result.reservedLockerDetailId);
 				setReservedLockerId(res.data.result.reservedLockerDetailId);
 			})
 			.catch((err) => {
@@ -111,7 +112,7 @@ function Reserve() {
 	}, []);
 
 	useEffect(() => {
-		connectSSE();
+		// connectSSE();
 	}, []);
 
 	// 서버 SSE 연결
@@ -173,17 +174,23 @@ function Reserve() {
 			},
 		})
 			.then((res) => {
-				setReservedLockerId(e);
-				let copyInfo = [...lockerInfo];
-				copyInfo.forEach((i) => {
-					i.lockerDetail.forEach((detail) => {
-						if (detail.id === e) {
-							detail.status = "RESERVED";
-						}
+				// console.log(res);
+				if (res.status === 200) {
+					setReservedLockerId(e);
+					let copyInfo = [...lockerInfo];
+					copyInfo.forEach((i) => {
+						i.lockerDetail.forEach((detail) => {
+							if (detail.id === e) {
+								detail.status = "RESERVED";
+							}
+						});
 					});
-				});
-				setLockerInfo(copyInfo);
-				setAlertReserveModal(true);
+					setLockerInfo(copyInfo);
+					setAlertReserveModal(true);
+					setNonetargetModal(true);
+				} else {
+					setPrevReserveModal(true);
+				}
 			})
 			.catch((err) => {
 				console.log(err);
@@ -216,7 +223,7 @@ function Reserve() {
 					});
 				});
 				setLockerInfo(copyInfo);
-				reserve(id);
+				// reserve(id);
 			})
 			.catch((err) => {
 				console.log(err);
@@ -489,6 +496,9 @@ function Reserve() {
 						<PrevReserveModal
 							setPrevReserveModal={setPrevReserveModal}
 							prevReserveModal={prevReserveModal}></PrevReserveModal>
+						<NonetargetModal
+							setNonetargetModal={setNonetargetModal}
+							nonetargetModal={nonetargetModal}></NonetargetModal>
 					</div>
 				</div>
 			</ContentContainer>
@@ -571,6 +581,31 @@ function PrevReserveModal(props) {
 			centered>
 			<Modal.Body>
 				<p className="modalTitle">이미 예약된 사물함이에요.</p>
+				<p className="modalDetail">다른 사물함을 선택해주세요</p>
+				<button
+					variant="secondary"
+					onClick={handleClose}
+					className="modalRedBTN"
+					style={{ width: "25rem" }}>
+					확인
+				</button>
+			</Modal.Body>
+		</Modal>
+	);
+}
+
+function NonetargetModal(props) {
+	const handleClose = () => props.setNonetargetModal(false);
+
+	return (
+		<Modal
+			show={props.nonetargetModal}
+			onHide={handleClose}
+			backdrop="static"
+			keyboard={false}
+			centered>
+			<Modal.Body>
+				<p className="modalTitle">사물함 예약 대상이 아니에요</p>
 				<p className="modalDetail">다른 사물함을 선택해주세요</p>
 				<button
 					variant="secondary"
