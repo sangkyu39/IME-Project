@@ -424,6 +424,7 @@ const DivStyled = styled.div`
     font-style: normal;
   }
   width: 90vw;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;

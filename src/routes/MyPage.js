@@ -3,6 +3,7 @@ import Sidebar from "../components/Sidebar";
 import InfoImg from "../assets/MyInfo.png";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+axios.defaults.baseURL = process.env.REACT_APP_BASE_URL;
 
 function MyPage() {
   const [userId, setUserId] = useState("");
@@ -32,7 +33,7 @@ function MyPage() {
       setUserId(parsedUserObj.userId);
       setRole(parsedUserObj.role);
       axios
-        .get(`http://54.180.70.111:8083/api/v2/users/${parsedUserObj.userId}`, {
+        .get(`api/v2/users/${parsedUserObj.userId}`, {
           headers: {
             accessToken: parsedUserObj.accessToken,
           },
