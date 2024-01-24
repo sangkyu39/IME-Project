@@ -68,7 +68,7 @@ function Reserve() {
 				},
 			})
 			.then((res) => {
-				console.log(res.data);
+				// console.log(res.data);
 				setLockerInfo(res.data.result.lockersInfo);
 				setLockerName(
 					res.data.result.lockersInfo.map((i) => {
@@ -96,7 +96,7 @@ function Reserve() {
 				},
 			})
 			.then((res) => {
-				console.log(res.data.result.reservedLockerDetailId);
+				// console.log(res.data.result.reservedLockerDetailId);
 				setReservedLockerId(res.data.result.reservedLockerDetailId);
 			})
 			.catch((err) => {
@@ -107,31 +107,35 @@ function Reserve() {
 	useEffect(() => {
 		getLockerInfo();
 		getUserInfo();
-		connectSSE();
 		// refreshToken();
+	}, []);
+
+	useEffect(() => {
+		connectSSE();
 	}, []);
 
 	// 서버 SSE 연결
 	const connectSSE = () => {
 		const url =
 			"http://54.180.70.111:8083/api/v2/sse/connect/lockers?majorId=" + encodeURI(userObj.majorId);
+		const eventSource = EventSourcePolyfill || NativeEventSource;
 
-		const eventSource = new EventSourcePolyfill(url, {
+		eventSource.current = new EventSourcePolyfill(url, {
 			headers: {
 				accessToken: userObj.accessToken,
 			},
 		});
-
-		eventSource.onopen = (event) => {
+		console.log(eventSource);
+		eventSource.current.onopen = (event) => {
 			console.log("SSE 연결이 열렸습니다.");
 			console.log(event);
 		};
 
-		eventSource.onmessage = (event) => {
-			console.log("SSE 메시지를 수신하였습니다:", event);
+		eventSource.current.onmessage = (event) => {
+			console.log(event);
 		};
 
-		eventSource.onerror = (error) => {
+		eventSource.current.onerror = (error) => {
 			console.error(error);
 		};
 	};
@@ -169,7 +173,6 @@ function Reserve() {
 			},
 		})
 			.then((res) => {
-				console.log(res);
 				setReservedLockerId(e);
 				let copyInfo = [...lockerInfo];
 				copyInfo.forEach((i) => {
